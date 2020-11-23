@@ -2,9 +2,11 @@
 
 
 #include "cs378_PlayerController.h"
+#include "../Inventory/InventoryComponent.h"
 
 Acs378_PlayerController::Acs378_PlayerController()
 {
+	Inv = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
 void Acs378_PlayerController::SetupInputComponent()
@@ -17,6 +19,9 @@ void Acs378_PlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("AttackAction", IE_Pressed, this, &Acs378_PlayerController::Attack);
 	InputComponent->BindAction("InteractAction", IE_Pressed, this, &Acs378_PlayerController::Pickup);
+
+	InputComponent->BindAction("Interact", IE_Pressed, Inv, &UInventoryComponent::Interact);
+
 }
 
 void Acs378_PlayerController::Forward(float value)
@@ -71,4 +76,9 @@ void Acs378_PlayerController::Pickup()
 	{
 		character->PickupBPEvent();
 	}
+}
+
+UInventoryComponent* Acs378_PlayerController::GetInventory()
+{
+	return this->Inv;
 }

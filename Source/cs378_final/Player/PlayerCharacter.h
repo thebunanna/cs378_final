@@ -8,6 +8,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SphereComponent.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -54,6 +55,9 @@ class CS378_FINAL_API APlayerCharacter : public ACharacter
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	/** Collection sphere */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inv, meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* CollectionSphere;
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
@@ -129,4 +133,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Pickup();
+
+
+	/** Function to check for the closest Interactable in sight and in range. */
+	UFUNCTION(BlueprintCallable)
+	void CheckForInteractables();
 };

@@ -5,6 +5,7 @@
 #include "PlayerCharacter.h"
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/PlayerController.h"
 #include "cs378_PlayerController.generated.h"
 
@@ -22,6 +23,9 @@ public:
 protected:
 	virtual void SetupInputComponent() override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		class UInventoryComponent* Inv;
+
 public:
 	void Forward(float value);
 	void Right(float value);
@@ -30,4 +34,6 @@ public:
 
 	void Attack();
 	void Pickup();
+
+	UInventoryComponent* GetInventory();
 };
