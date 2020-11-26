@@ -21,7 +21,8 @@ void Acs378_PlayerController::SetupInputComponent()
 	InputComponent->BindAction("InteractAction", IE_Pressed, this, &Acs378_PlayerController::Pickup);
 
 	InputComponent->BindAction("Interact", IE_Pressed, Inv, &UInventoryComponent::Interact);
-
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(1, 1.5f, FColor::White,
+	//	           TEXT("HI there"));
 }
 
 void Acs378_PlayerController::Forward(float value)

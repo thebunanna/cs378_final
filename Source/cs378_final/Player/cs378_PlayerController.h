@@ -35,5 +35,6 @@ public:
 	void Attack();
 	void Pickup();
 
+	UFUNCTION(BlueprintCallable)
 	UInventoryComponent* GetInventory();
 };
