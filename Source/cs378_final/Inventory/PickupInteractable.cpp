@@ -5,6 +5,7 @@
 #include "../Player/cs378_PlayerController.h"
 #include "InventoryComponent.h"
 
+
 APickupInteractable::APickupInteractable()
 {
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");

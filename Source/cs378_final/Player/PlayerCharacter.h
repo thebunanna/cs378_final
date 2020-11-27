@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "../Weapons/Weapon.h"
-
+#include "../Weapons/WeaponOld.h"
+#include <RPGCharacter/Player/ModularPlayerCharacter.h>
 #include "DrawDebugHelpers.h"
 
 #include "Camera/CameraComponent.h"
@@ -43,17 +43,9 @@ enum class ECharacterDirectionEnum : uint8
 };
 
 UCLASS()
-class CS378_FINAL_API APlayerCharacter : public ACharacter
+class CS378_FINAL_API APlayerCharacter : public AModularPlayerCharacter
 {
 	GENERATED_BODY()
-
-	/** The camera */
-	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* CameraComponent;
-
-	/** Camera boom positioning the camera above the character */
-	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
 
 	/** Collection sphere */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inv, meta = (AllowPrivateAccess = "true"))
@@ -62,80 +54,15 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
-	UPROPERTY(Category = State, EditAnywhere, BlueprintReadWrite)
-	ECharacterActionStateEnum CharacterActionState;
-
-	UPROPERTY(Category = State, EditAnywhere, BlueprintReadWrite)
-	ECharacterWeaponEnum WeaponState;
-
-	// UPROPERTY(Category = Weapon, EditAnywhere, BlueprintReadWrite)
-	// AActor* weapon;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Variables
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
-	float MovementSpeed;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
-	bool isAttack;
-
-	UPROPERTY(Category = Camera, EditAnywhere, BlueprintReadWrite)
-	float CameraYRotation;
-
-	UPROPERTY(Category = Camera, EditAnywhere, BlueprintReadWrite)
-	float CameraXRotation;
-
-	// Character state
-	UFUNCTION(BlueprintCallable)
-	bool CanPerformAction(ECharacterActionStateEnum updatedAction);
-
-	UFUNCTION(BlueprintCallable)
-	void UpdateActionState(ECharacterActionStateEnum newAction);
-
-	// Blueprint functions
-	UFUNCTION(BlueprintImplementableEvent)
-	void ForwardBPEvent(float value);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void RightBPEvent(float value);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void CameraYBPEvent(float value);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void CameraXBPEvent(float value);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void AttackBPEvent();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void PickupBPEvent();
-
-	// C++ Functions
-	UFUNCTION(BlueprintCallable)
-	void Forward(float value);
-
-	UFUNCTION(BlueprintCallable)
-	void Right(float value);
-
-	UFUNCTION(BlueprintCallable)
-	void CameraY(float value);
-
-	UFUNCTION(BlueprintCallable)
-	void CameraX(float value);
-
-	UFUNCTION(BlueprintCallable)
-	void Attack();
-
-	UFUNCTION(BlueprintCallable)
-	void Pickup();
-
-
 	/** Function to check for the closest Interactable in sight and in range. */
 	UFUNCTION(BlueprintCallable)
 	void CheckForInteractables();
+
+	virtual void Tick(float DeltaSeconds) override;
+
 };
