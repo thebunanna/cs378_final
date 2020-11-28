@@ -25,10 +25,10 @@ public:
 		void Interact(APlayerController* Controller);
 	virtual void Interact_Implementation(APlayerController* Controller);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 		FString Name;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 		FString Action;
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")

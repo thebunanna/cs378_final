@@ -57,6 +57,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	FTimerHandle TimerHandle_CheckInteract;
 
 public:	
 	/** Function to check for the closest Interactable in sight and in range. */

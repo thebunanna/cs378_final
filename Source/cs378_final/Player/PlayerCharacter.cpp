@@ -5,6 +5,7 @@
 #include "cs378_PlayerController.h"
 #include "../Inventory/InventoryComponent.h"
 #include "../Inventory/PickupInteractable.h"
+#include "TimerManager.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -22,6 +23,9 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	UWorld* const World = GetWorld();
+	if (World != NULL)
+		World->GetTimerManager().SetTimer(TimerHandle_CheckInteract, this, &APlayerCharacter::CheckForInteractables, 1, 1);
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -32,6 +36,8 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 
 void APlayerCharacter::CheckForInteractables()
 {
+	if (GEngine) GEngine->AddOnScreenDebugMessage(2, 1.5f, FColor::White,
+		TEXT("Something here!"));
 	// Get all overlapping Actors and store them in an array
 	TArray<AActor*> CollectedActors;
 	CollectionSphere->GetOverlappingActors(CollectedActors);
@@ -45,11 +51,15 @@ void APlayerCharacter::CheckForInteractables()
 			// If the cast is successful and the pickup is valid and active 
 			if (TestPickup && !TestPickup->IsPendingKill())
 			{
+				
 				IController->CurrentInteractable = TestPickup;
 				return;
 			}
 		}
 		IController->CurrentInteractable = nullptr;
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Not correct PC."));
 	}
 
 }

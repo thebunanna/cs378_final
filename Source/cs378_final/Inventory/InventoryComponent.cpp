@@ -21,7 +21,19 @@ UInventoryComponent::UInventoryComponent()
 bool UInventoryComponent::AddItemToInventoryByID(FName ID)
 {
 	ACS378FinalGameState* GameState = Cast<ACS378FinalGameState>(GetWorld()->GetGameState());
+
+	if (GameState == NULL) {
+		UE_LOG(LogTemp, Warning, TEXT("GAME STATE NOT EXIST"));
+		return false;
+	}
+
 	UDataTable* ItemTable = GameState->GetItemDB();
+
+	if (ItemTable == NULL) {
+		UE_LOG(LogTemp, Warning, TEXT("ITEM TABLE IS NULL"));
+		return false;
+	}
+
 	FInventoryItem* ItemToAdd = ItemTable->FindRow<FInventoryItem>(ID, "");
 
 	
@@ -47,4 +59,9 @@ void UInventoryComponent::Interact()
 	{
 		CurrentInteractable->Interact(Cast<Acs378_PlayerController>(GetOwner()));
 	}
+}
+
+void UInventoryComponent::ReloadInventory()
+{
+	Cast<Acs378_PlayerController>(GetOwner())->ReloadInventory();
 }

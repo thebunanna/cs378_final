@@ -16,6 +16,8 @@ class CS378_FINAL_API ACS378FinalGameState : public AGameState
 
 public:
 	ACS378FinalGameState();
+
+	UFUNCTION(BlueprintCallable)
 	UDataTable* GetItemDB() const;
 
 protected:

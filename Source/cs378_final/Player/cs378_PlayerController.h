@@ -6,7 +6,7 @@
 
 #include <RPGCharacter/Player/ModularPlayerController.h>
 #include "CoreMinimal.h"
-
+#include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
 #include "cs378_PlayerController.generated.h"
 
@@ -24,11 +24,12 @@ public:
 protected:
 	virtual void SetupInputComponent() override;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		class UInventoryComponent* Inv;
-
 public:
-	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Inventory)
+		class UInventoryComponent* Inv;
 	UFUNCTION(BlueprintCallable)
-	UInventoryComponent* GetInventory();
+		UInventoryComponent* GetInventory();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void ReloadInventory();
 };

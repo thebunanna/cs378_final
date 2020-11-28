@@ -9,7 +9,7 @@
 #include "InventoryComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CS378_FINAL_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -21,7 +21,7 @@ public:
 	UFUNCTION()
 		void Interact();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION()
 		void ReloadInventory();
 
 	UFUNCTION(BlueprintCallable, Category = "Utils")
