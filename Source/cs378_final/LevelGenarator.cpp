@@ -157,18 +157,39 @@ void ALevelGenarator::DungeonLayout()
     }
     
     
-//      int LayoutTest[][3] = { {1, 1, 1}, {0, 0, 0}, {0,0,0} };
-//
-//
-//      RoomCount = 3;
-//      RoomLocationR[3];
-//      RoomLocationC[3];
-//      RoomLocationR[0] = 0;
-//      RoomLocationC[0] = 0;
-//      RoomLocationR[1] = 0;
-//      RoomLocationC[1] = 1;
-//      RoomLocationR[2] = 0;
-//      RoomLocationC[2] = 2;
+    int LayoutTest[][5] = { {1, 1, 1,0,0}, {1, 0, 0,0,0}, {1,0,0,0,0}, {1,1,1,0,0},{1,0,0,0,0}};
+
+
+      RoomCount = 9;
+    MaxRooms = 5;
+      RoomLocationR[3];
+      RoomLocationC[3];
+      RoomLocationR[0] = 0;
+      RoomLocationC[0] = 0;
+    
+      RoomLocationR[1] = 0;
+      RoomLocationC[1] = 1;
+    
+      RoomLocationR[2] = 0;
+      RoomLocationC[2] = 2;
+    
+    RoomLocationR[3] = 1;
+    RoomLocationC[3] = 0;
+    
+    RoomLocationR[4] = 2;
+    RoomLocationC[4] = 0;
+    
+    RoomLocationR[5] = 3;
+    RoomLocationC[5] = 0;
+    
+    RoomLocationR[6] = 3;
+    RoomLocationC[6] = 1;
+    
+    RoomLocationR[7] = 3;
+    RoomLocationC[7] = 2;
+    
+    RoomLocationR[8] = 4;
+    RoomLocationC[8] = 0;
     
     
     
@@ -189,7 +210,7 @@ void ALevelGenarator::DungeonLayout()
         }
         
         //CHECK TO RIGHT COL
-        if((RoomLocationC[i] +1 < MaxRooms*2 && RoomLayout[RoomLocationR[i]][RoomLocationC[i]+1] == 0)|| RoomLocationC[i]+1 >=MaxRooms*2)
+        if((RoomLocationC[i] +1 < MaxRooms*2 && LayoutTest[RoomLocationR[i]][RoomLocationC[i]+1] == 0)|| RoomLocationC[i]+1 >=MaxRooms*2)
         {
             FVector Location1(0.0f+600.f*RoomLocationR[i], 0.0f+600.f*(RoomLocationC[i]+1), 120.0f);
             FRotator Rotation1(0.0f, -90.0f, 0.0f);
@@ -203,7 +224,7 @@ void ALevelGenarator::DungeonLayout()
         }
 
         //CHECK TO LEFT COL
-       if((RoomLocationC[i] -1 >=0 && RoomLayout[RoomLocationR[i]][RoomLocationC[i]-1] == 0))
+       if((RoomLocationC[i] -1 >=0 && LayoutTest[RoomLocationR[i]][RoomLocationC[i]-1] == 0))
        {
            FVector Location1(0.0f+600.f*RoomLocationR[i], 0.0f+600.f*(RoomLocationC[i]), 120.0f);
            FRotator Rotation1(0.0f, -90.0f, 0.0f);
@@ -217,7 +238,7 @@ void ALevelGenarator::DungeonLayout()
        }
 
         //CHECK TO ABOVE ROW
-        if((RoomLocationR[i] +1 < MaxRooms*2 && RoomLayout[RoomLocationR[i]+1][RoomLocationC[i]] == 0) || RoomLocationR[i]+1 >=MaxRooms*2)
+        if((RoomLocationR[i] +1 < MaxRooms*2 && LayoutTest[RoomLocationR[i]+1][RoomLocationC[i]] == 0) || RoomLocationR[i]+1 >=MaxRooms*2)
         {
             FVector Location1(0.0f+600.f*(RoomLocationR[i]+1), 0.0f+600.f*RoomLocationC[i], 120.0f);
             FRotator Rotation1(0.0f, 0.0f, 0.0f);
@@ -240,7 +261,7 @@ void ALevelGenarator::DungeonLayout()
         
 
         //CHECK TO BELOW ROW
-        if((RoomLocationR[i] -1 >=0 && RoomLayout[RoomLocationR[i]-1][RoomLocationC[i]] == 0) || RoomLocationR[i]-1 < 0)
+        if((RoomLocationR[i] -1 >=0 && LayoutTest[RoomLocationR[i]-1][RoomLocationC[i]] == 0) || RoomLocationR[i]-1 < 0)
         {
             FVector Location1(0.0f+600.f*(RoomLocationR[i]), 0.0f+600.f*RoomLocationC[i], 120.0f);
             FRotator Rotation1(0.0f, 0.0f, 0.0f);
