@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "LevelGenarator.h"
 #include "LevelTile.h"
 #include "WallTile.h"
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/PlayerStart.h"
-#include "LevelGenarator.h"
+
 
 // Sets default values
 ALevelGenarator::ALevelGenarator()
@@ -77,18 +78,20 @@ void ALevelGenarator::Tick(float DeltaTime)
 void ALevelGenarator::DungeonLayout()
 {
     int RoomCount = FMath::RandRange(MinRooms, MaxRooms);
-            if(GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("Number of rooms: %d"), RoomCount));
-            }
+    if(GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("Number of rooms: %d"), RoomCount));
+    }
     
     RoomStartRow = FMath::RandRange(0, MaxRooms-1);
     RoomStartCol = FMath::RandRange(0, MaxRooms-1);
-    int RoomLayout[MaxRooms*2][MaxRooms*2];
+
+    //int RoomLayout[MaxRooms*2][MaxRooms*2];
+    int RoomLayout[40][40];
     RoomLayout[RoomStartRow][RoomStartCol] = 1;
     
-    int RoomLocationR[RoomCount];
-    int RoomLocationC[RoomCount];
+    int RoomLocationR[5];
+    int RoomLocationC[5];
     
     int currentRow = RoomStartRow;
     int currentCol = RoomStartCol;

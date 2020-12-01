@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "LevelTile.h"
 
 //#include "ConstructorHelpers.h"
 #include "Engine/StaticMesh.h"
-#include "LevelTile.h"
 
 // Sets default values
 ALevelTile::ALevelTile()
