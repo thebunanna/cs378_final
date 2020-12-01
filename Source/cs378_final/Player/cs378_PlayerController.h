@@ -4,7 +4,9 @@
 
 #include "PlayerCharacter.h"
 
+#include <RPGCharacter/Player/ModularPlayerController.h>
 #include "CoreMinimal.h"
+#include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
 #include "cs378_PlayerController.generated.h"
 
@@ -12,7 +14,7 @@
  * 
  */
 UCLASS()
-class CS378_FINAL_API Acs378_PlayerController : public APlayerController
+class CS378_FINAL_API Acs378_PlayerController : public AModularPlayerController
 {
 	GENERATED_BODY()
 
@@ -23,11 +25,11 @@ protected:
 	virtual void SetupInputComponent() override;
 
 public:
-	void Forward(float value);
-	void Right(float value);
-	void CameraY(float value);
-	void CameraX(float value);
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Inventory)
+		class UInventoryComponent* Inv;
+	UFUNCTION(BlueprintCallable)
+		UInventoryComponent* GetInventory();
 
-	void Attack();
-	void Pickup();
+	UFUNCTION(BlueprintImplementableEvent)
+		void ReloadInventory();
 };
