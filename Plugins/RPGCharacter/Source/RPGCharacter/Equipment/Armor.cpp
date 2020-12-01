@@ -11,6 +11,30 @@ AArmor::AArmor()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-	ArmorMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ArmorMesh"));
-	ArmorMesh->SetupAttachment(RootComponent);
+	FemaleArmorMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FemaleArmorMesh"));
+	FemaleArmorMesh->SetupAttachment(RootComponent);
+
+	FemaleArmorMesh->AddRelativeLocation(FVector(0, 0, -88));
+	FemaleArmorMesh->AddLocalRotation(FQuat(FRotator(0, -90, 0)));
+
+	MaleArmorMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MaleArmorMesh"));
+	MaleArmorMesh->SetupAttachment(RootComponent);
+
+	MaleArmorMesh->AddRelativeLocation(FVector(0, 0, -88));
+	MaleArmorMesh->AddLocalRotation(FQuat(FRotator(0, -90, 0)));
+	MaleArmorMesh->SetVisibility(false);
+}
+
+void AArmor::SetGender(bool gender)
+{
+	if (gender)
+	{
+		MaleArmorMesh->SetVisibility(true);
+		FemaleArmorMesh->SetVisibility(false);
+	}
+	else
+	{
+		MaleArmorMesh->SetVisibility(false);
+		FemaleArmorMesh->SetVisibility(true);
+	}
 }
