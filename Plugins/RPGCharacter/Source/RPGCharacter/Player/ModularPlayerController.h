@@ -31,4 +31,29 @@ public:
 	void Attack();
 	void Block();
 	void StopBlock();
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeGender(bool gender);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeHair(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeHead(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeEyebrows(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeFacialHair(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void Save();
+
+	UFUNCTION(BlueprintCallable)
+		void EquipNone();
+
+
+	void EquipLight();
+	void EquipHeavy();
 };

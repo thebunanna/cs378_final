@@ -18,11 +18,17 @@ public:
 	AArmor();
 
 	UPROPERTY(Category = Armor, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* ArmorMesh;
+		class USkeletalMeshComponent* FemaleArmorMesh;
+
+	UPROPERTY(Category = Armor, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		class USkeletalMeshComponent* MaleArmorMesh;
 
 	UPROPERTY(Category = Armor, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		EArmorPartEnum ArmorPart;
 
 	UPROPERTY(Category = Armor, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		int Defense;
+
+	UFUNCTION(BlueprintCallable)
+		void SetGender(bool gender);
 };
