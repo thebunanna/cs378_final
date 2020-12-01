@@ -18,6 +18,10 @@ void AModularPlayerController::SetupInputComponent()
 	InputComponent->BindAction("AttackAction", IE_Pressed, this, &AModularPlayerController::Attack);
 	InputComponent->BindAction("BlockAction", IE_Pressed, this, &AModularPlayerController::Block);
 	InputComponent->BindAction("BlockAction", IE_Released, this, &AModularPlayerController::StopBlock);
+
+	InputComponent->BindAction("1", IE_Pressed, this, &AModularPlayerController::EquipNone);
+	InputComponent->BindAction("2", IE_Pressed, this, &AModularPlayerController::EquipLight);
+	InputComponent->BindAction("3", IE_Pressed, this, &AModularPlayerController::EquipHeavy);
 }
 
 void AModularPlayerController::Forward(float value)
@@ -80,5 +84,86 @@ void AModularPlayerController::StopBlock()
 	if (character)
 	{
 		character->BlockStopBPEvent();
+	}
+}
+
+void AModularPlayerController::ChangeGender(bool gender)
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->ChangeGender(gender);
+	}
+}
+
+void AModularPlayerController::ChangeHair(float value)
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->ChangeHair(value);
+	}
+}
+
+void AModularPlayerController::ChangeHead(float value)
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->ChangeHead(value);
+	}
+}
+
+void AModularPlayerController::ChangeEyebrows(float value)
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->ChangeEyebrows(value);
+	}
+}
+
+void AModularPlayerController::ChangeFacialHair(float value)
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->ChangeFacialHair(value);
+	}
+}
+
+void AModularPlayerController::Save()
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->SaveBPEvent();
+	}
+}
+
+void AModularPlayerController::EquipNone()
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->EquipNoneArmor();
+	}
+}
+
+void AModularPlayerController::EquipLight()
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->EquipLightArmor();
+	}
+}
+
+void AModularPlayerController::EquipHeavy()
+{
+	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->EquipHeavyArmor();
 	}
 }

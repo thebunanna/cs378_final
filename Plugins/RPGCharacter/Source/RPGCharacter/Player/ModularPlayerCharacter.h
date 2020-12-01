@@ -8,6 +8,7 @@
 #include "../Equipment/Weapon.h"
 #include "../Equipment/Shield.h"
 
+#include "PlayerData.h"
 #include "CharacterStates.h"
 
 #include "Camera/CameraComponent.h"
@@ -37,7 +38,7 @@ public:
 	// Sets default values for this character's properties
 	AModularPlayerCharacter();
 
-	void AttachMesh(FName, USkeletalMeshComponent*);
+	void AttachMesh(USkeletalMeshComponent*, EArmorPartEnum);
 
 	UPROPERTY(Category = State, EditAnywhere, BlueprintReadWrite)
 		ECharacterStateEnum CharacterState;
@@ -55,59 +56,36 @@ public:
 		float CurrentHP;
 
 	/** Mesh Components */
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* Head;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		TMap<EArmorPartEnum, AArmor*> EquippedArmor;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* Hair;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		bool gender;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* Eyebrows;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int Hair_Option;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* FacialHair;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int Head_Option;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* Torso;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int Eyebrows_Option;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* LeftShoulder;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int FacialHair_Option;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* LeftUpperArm;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMeshComponent* Head;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* LeftLowerArm;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMeshComponent* Hair;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* LeftHand;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMeshComponent* Eyebrows;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* RightShoulder;
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMeshComponent* FacialHair;
 
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* RightUpperArm;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* RightLowerArm;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* RightHand;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* Hips;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* LeftKnee;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* LeftLeg;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* RightKnee;
-
-	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* RightLeg;
 
 protected:
 	// Called when the game starts or when spawned
@@ -153,6 +131,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void BlockStopBPEvent();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void SaveBPEvent();
+
 	// C++ Functions
 	UFUNCTION(BlueprintCallable)
 		void Forward(float value);
@@ -175,10 +156,63 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void TakeDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	// Debugging
-	// UFUNCTION(BlueprintCallable)
-	// 	void LoadWeapon();
 
-	// UFUNCTION(BlueprintCallable)
-	// 	void LoadShield();
+	// ------------------
+	// Character Creation
+	// ------------------
+
+	UFUNCTION(BlueprintCallable)
+		void EquipArmor(AArmor* armorPiece);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeGender(bool NewGender);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeHead(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeHair(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeEyebrows(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeFacialHair(float value);
+
+	UFUNCTION(BlueprintCallable)
+		void ChangePart(USkeletalMeshComponent* headPart, FString refrence);
+
+
+	// ---------
+	// Save Data
+	// ---------
+
+	UFUNCTION(BlueprintCallable)
+		void Save();
+
+	UFUNCTION(BlueprintCallable)
+		void Load();
+
+
+	// ---------
+	// Debugging
+	// ---------
+
+	UFUNCTION(BlueprintCallable)
+		void EquipNoneArmor();
+
+	UFUNCTION(BlueprintCallable)
+		void EquipLightArmor();
+
+	UFUNCTION(BlueprintCallable)
+		void EquipHeavyArmor();
+
+	UFUNCTION(BlueprintCallable)
+	 	void LoadWeapon();
+
+	UFUNCTION(BlueprintCallable)
+		void LoadWeapon2();
+
+	UFUNCTION(BlueprintCallable)
+	 	void LoadShield();
 };

@@ -4,6 +4,8 @@
 
 #include "WeaponTypes.h"
 
+#include "Components/BoxComponent.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
@@ -19,6 +21,9 @@ public:
 
 	UPROPERTY(Category = Weapon, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* WeaponMesh;
+
+	UPROPERTY(Category = Weapon, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UBoxComponent* CollisionComponent;
 
 	UPROPERTY(Category = Weapon, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		EWeaponTypeEnum WeaponType;

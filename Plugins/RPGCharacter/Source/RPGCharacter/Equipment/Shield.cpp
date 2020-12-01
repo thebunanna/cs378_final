@@ -13,4 +13,7 @@ AShield::AShield()
 
 	ShieldMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ShieldMesh"));
 	ShieldMesh->SetupAttachment(RootComponent);
+
+	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
+	CollisionComponent->SetupAttachment(ShieldMesh);
 }
