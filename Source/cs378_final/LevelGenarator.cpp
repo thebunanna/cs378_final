@@ -90,8 +90,8 @@ void ALevelGenarator::DungeonLayout()
     int RoomLayout[40][40];
     RoomLayout[RoomStartRow][RoomStartCol] = 1;
     
-    int RoomLocationR[5];
-    int RoomLocationC[5];
+    int RoomLocationR[13];
+    int RoomLocationC[13];
     
     int currentRow = RoomStartRow;
     int currentCol = RoomStartCol;
@@ -166,8 +166,8 @@ void ALevelGenarator::DungeonLayout()
 
       RoomCount = 9;
     MaxRooms = 5;
-      RoomLocationR[13];
-      RoomLocationC[13];
+//      RoomLocationR[13];
+//      RoomLocationC[13];
       RoomLocationR[0] = 0;
       RoomLocationC[0] = 0;
     
