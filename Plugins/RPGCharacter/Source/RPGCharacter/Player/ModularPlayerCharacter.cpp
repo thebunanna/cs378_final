@@ -38,7 +38,7 @@ AModularPlayerCharacter::AModularPlayerCharacter()
 	FacialHair->SetupAttachment(GetMesh());
 	FacialHair->SetMasterPoseComponent(GetMesh());
 
-	// GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AModularPlayerCharacter::TakeDamage);
+	// GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AModularPlayerCharacter::TakeCharDamage);
 
 	// Variables
 	MaxHP = 100.f;
@@ -128,7 +128,7 @@ void AModularPlayerCharacter::Block()
 
 }
 
-void AModularPlayerCharacter::TakeDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AModularPlayerCharacter::TakeCharDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->IsA(AWeapon::StaticClass()))
 	{
