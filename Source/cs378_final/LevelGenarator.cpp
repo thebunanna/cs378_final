@@ -3,6 +3,7 @@
 #include "LevelTile.h"
 #include "WallTile.h"
 #include "Math/UnrealMathUtility.h"
+#include "GameFramework/PlayerStart.h"
 #include "LevelGenarator.h"
 
 // Sets default values
@@ -162,8 +163,8 @@ void ALevelGenarator::DungeonLayout()
 
       RoomCount = 9;
     MaxRooms = 5;
-      RoomLocationR[3];
-      RoomLocationC[3];
+      RoomLocationR[13];
+      RoomLocationC[13];
       RoomLocationR[0] = 0;
       RoomLocationC[0] = 0;
     
@@ -190,6 +191,18 @@ void ALevelGenarator::DungeonLayout()
     
     RoomLocationR[8] = 4;
     RoomLocationC[8] = 0;
+    
+//    RoomLocationR[9] = 0;
+//    RoomLocationC[9] = 3;
+//
+//    RoomLocationR[10] = 0;
+//    RoomLocationC[10] = 4;
+//
+//    RoomLocationR[11] = 1;
+//    RoomLocationC[11] = 4;
+//
+//    RoomLocationR[12] = 2;
+//    RoomLocationC[12] = 4;
     
     
     
@@ -218,13 +231,14 @@ void ALevelGenarator::DungeonLayout()
             GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
             if(GEngine)
             {
-                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall"));
+                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall Right"));
             }
 
         }
 
         //CHECK TO LEFT COL
-       if((RoomLocationC[i] -1 >=0 && LayoutTest[RoomLocationR[i]][RoomLocationC[i]-1] == 0))
+       if((RoomLocationC[i] -1 >=0 && LayoutTest[RoomLocationR[i]][RoomLocationC[i]-1] == 0)||
+          RoomLocationC[i]-1 < 0)
        {
            FVector Location1(0.0f+600.f*RoomLocationR[i], 0.0f+600.f*(RoomLocationC[i]), 120.0f);
            FRotator Rotation1(0.0f, -90.0f, 0.0f);
@@ -232,7 +246,7 @@ void ALevelGenarator::DungeonLayout()
            GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
            if(GEngine)
            {
-               GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall"));
+               GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("Spawned Wall Left"));
            }
 
        }
@@ -269,7 +283,7 @@ void ALevelGenarator::DungeonLayout()
             GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
             if(GEngine)
             {
-                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawned Wall"));
+                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawned Wall Below"));
             }
 
         }
@@ -279,6 +293,17 @@ void ALevelGenarator::DungeonLayout()
 
 
     }
+    
+    //SPAWN PLAYER START
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.Owner = this;
+    SpawnInfo.Instigator = NULL;
+    SpawnInfo.bDeferConstruction = false;
+    FVector Loc(50.0f+600.f*RoomLocationR[0], 50.0f+600.f*RoomLocationC[0], 150.0f);
+     
+//    APlayerStart* PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
+    
+    GetWorld()->SpawnActor<APlayerStart>(Loc, FRotator::ZeroRotator, SpawnInfo);
     
 
 
