@@ -14,6 +14,57 @@ ALevelGenarator::ALevelGenarator()
 	PrimaryActorTick.bCanEverTick = true;
     MinRooms = 8;
     MaxRooms = 20;
+    MapBounds = MaxRooms*2;
+    RoomCount = FMath::RandRange(MinRooms, MaxRooms);
+    MaxTilePerRoom = MapBounds;
+    
+    
+//    MAKE SURE TO FREE RESOURCES
+    
+    //Allocate MapTiles
+//    MapTiles = (int **)FMemory::Malloc(sizeof(int)*MapBounds);
+//    for(int i = 0; i < MapBounds; i++)
+//    {
+//        if(MapTiles)
+//        {
+//            MapTiles[i] = (int *)FMemory::Malloc(sizeof(int)*MapBounds);
+//        }
+//    }
+//
+//    //Allocate Tile Location Info
+//    for(int i = 0; i<RoomCount; i++)
+//    {
+//        RoomTileCount.Add(i, 0);
+//        int *RowArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
+//        int *ColArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
+//        RoomRows.Add(i, RowArr);
+//        RoomCols.Add(i, ColArr);
+//
+//    }
+    
+    
+    
+    //Get Meshes for building dungeon
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> FloorAsset (TEXT("StaticMesh'/Game/MedievalDungeon/Meshes/Architecture/Dungeon/SM_Floor.SM_Floor'"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> WallAsset (TEXT("StaticMesh'/Game/MedievalDungeon/Meshes/Architecture/Dungeon/SM_Dungeon_Wall.SM_Dungeon_Wall'"));
+
+    //Set Meshes
+    if (FloorAsset.Succeeded())
+    {
+        if(GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Found Constructor Floor"));
+        }
+        Tile = FloorAsset.Object;
+    }
+    if(WallAsset.Succeeded())
+    {
+        if(GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Found Constructor Wall"));
+        }
+        Wall = WallAsset.Object;
+    }
 
 }
 
@@ -64,7 +115,7 @@ void ALevelGenarator::BeginPlay()
 //        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Spawned LevelTile"));
 //    }
     
-    
+    SetupMapData();
     DungeonLayout();
 }
 
@@ -74,14 +125,208 @@ void ALevelGenarator::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+void ALevelGenarator::SetupMapData()
+{
+        //Allocate MapTiles
+        MapTiles = (int **)FMemory::Malloc(sizeof(int)*MapBounds);
+        for(int i = 0; i < MapBounds; i++)
+        {
+            if(MapTiles)
+            {
+                MapTiles[i] = (int *)FMemory::Malloc(sizeof(int)*MapBounds);
+            }
+        }
+    
+        //Allocate Tile Location Info
+        for(int i = 1; i<=RoomCount; i++)
+        {
+            RoomTileCount.Add(i, 0);
+            int *RowArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
+            int *ColArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
+            RoomRows.Add(i, RowArr);
+            RoomCols.Add(i, ColArr);
+    
+        }
+}
+
+void ALevelGenarator::PlaceRoomStarts()
+{
+    for(int RoomNum = 1; RoomNum <= RoomCount; RoomNum++)
+    {
+        
+        int iteration = 0;
+        bool ValidRoom = false;
+        while(iteration < 15 && !ValidRoom)
+        {
+            int RowVal = 0;
+            int ColVal = 0;
+            if(RoomNum == 1)
+            {
+                RowVal = FMath::RandRange(0, MapBounds-1);
+                ColVal = FMath::RandRange(0, 3);
+            } else if(RoomNum == RoomCount)
+            {
+                RowVal = FMath::RandRange(0, MapBounds-1);
+                ColVal = FMath::RandRange(MapBounds-3, MapBounds-1);
+            } else
+            {
+                RowVal = FMath::RandRange(0, MapBounds-1);
+                ColVal = FMath::RandRange(0, MapBounds-1);
+            }
+            if(CheckValidSpot(RowVal, ColVal, RoomNum))
+            {
+                MapTiles[RowVal][ColVal] = RoomNum;
+                RoomTileCount.Add(RoomNum, 1);
+                if(RoomRows.Contains(RoomNum))
+                {
+                    int *temp = RoomRows[RoomNum];
+                    temp[0] = RowVal;
+                }
+                if(RoomCols.Contains(RoomNum))
+                {
+                    int *temp = RoomCols[RoomNum];
+                    temp[0] = ColVal;
+                }
+            }
+            FVector FloorLocation(0.f+600.f*RowVal,0.f+600.f*ColVal,75.f);
+            SpawnFloor(FloorLocation);
+            ValidRoom = true;
+            iteration+=1;
+            if(ValidRoom && RoomNum ==1)
+            {
+                RoomStartRow = RowVal;
+                RoomStartCol = ColVal;
+            } else if(ValidRoom && RoomNum == RoomCount)
+            {
+                RoomEndRow = RowVal;
+                RoomEndCol = ColVal;
+            }
+        }
+        if(iteration > 15)
+        {
+            if(GEngine)
+            {
+                    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("Room Number: %d could not be placed"), RoomNum));
+            }
+        }
+    }
+    CleanUp();
+    
+}
+bool ALevelGenarator::CheckValidSpot(int r, int c, int room)
+{
+    int RDirection[] = {0,0,1,-1};
+    int CDirection[] = {1,-1,0,0};
+    
+    if (r < 0 || r>= MapBounds || c <0 || c>=MapBounds){
+        return false;
+    }
+    
+    
+    if(MapTiles[r][c] == 0)
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            int NearbyValue = MapTiles[r+RDirection[i]][c+CDirection[i]];
+            if(NearbyValue != 0 && NearbyValue!= room)
+            {
+                return false;
+            }
+        }
+        return true;
+
+    }
+    return false;
+    
+}
 
 void ALevelGenarator::DungeonLayout()
 {
-    int RoomCount = FMath::RandRange(MinRooms, MaxRooms);
-    if(GEngine)
+    
+    
+    //Floor
+    FVector FloorLocation(0.f,0.f,75.f);
+    
+    //RightCol
+    FVector LocationTest1(0.0f, 0.0f+600.f*1, 70.f);
+    FRotator RotationTest1(0.0f, -90.0f, 0.0f);
+    
+    //LeftCol
+    FVector LocationTest2(0.0f, 0.0f, 70.f);
+    FRotator RotationTest2(0.0f, -90.0f, 0.0f);
+    
+    //AboveRow
+    FVector LocationTest3(0.0f+600.f*1, 0.0f, 70.f);
+    FRotator RotationTest3(0.0f, 0.0f, 0.0f);
+    
+    //BelowRow
+    FVector LocationTest4(0.0f, 0.0f, 70.f);
+    FRotator RotationTest4(0.0f, 0.0f, 0.0f);
+    
+    
+    //Arr for level tile spots
+    //Map with row coords
+    //Map with col coords
+    PlaceRoomStarts();
+    
+    
+    
+    
+    return;
+    
+    
+    
+    
+    
+    
+    
+    int value = 5;
+    int *Rooms = (int *)FMemory::Malloc(sizeof(int)*value);
+    for (int idx = 0; idx < 5; idx++)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("Number of rooms: %d"), RoomCount));
+        Rooms[idx] = 0;
+        
+
     }
+    
+    int **arr = (int **)FMemory::Malloc(sizeof(int)*value);
+    for(int i = 0; i < value; i++)
+    {
+        arr[i] = (int *)FMemory::Malloc(sizeof(int)*value);
+    }
+    for(int r = 0; r < value; r++)
+    {
+        for(int c = 0; c < value; c++)
+        {
+            arr[r][c] = 0;
+            if(GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Yup"));
+            }
+        }
+    }
+    
+    TMap<int, int**> FruitMap;
+    FruitMap.Add(5, arr);
+
+
+
+    
+    
+    
+    return;
+    
+    
+    
+    
+    
+    
+    
+    RoomCount = FMath::RandRange(MinRooms, MaxRooms);
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("Number of rooms: %d"), RoomCount));
+//    }
     
     RoomStartRow = FMath::RandRange(0, MaxRooms-1);
     RoomStartCol = FMath::RandRange(0, MaxRooms-1);
@@ -232,10 +477,10 @@ void ALevelGenarator::DungeonLayout()
             FRotator Rotation1(0.0f, -90.0f, 0.0f);
             FActorSpawnParameters SpawnInfo1;
             GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-            if(GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall Right"));
-            }
+//            if(GEngine)
+//            {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall Right"));
+//            }
 
         }
 
@@ -247,10 +492,10 @@ void ALevelGenarator::DungeonLayout()
            FRotator Rotation1(0.0f, -90.0f, 0.0f);
            FActorSpawnParameters SpawnInfo1;
            GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-           if(GEngine)
-           {
-               GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("Spawned Wall Left"));
-           }
+//           if(GEngine)
+//           {
+//               GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("Spawned Wall Left"));
+//           }
 
        }
 
@@ -261,10 +506,10 @@ void ALevelGenarator::DungeonLayout()
             FRotator Rotation1(0.0f, 0.0f, 0.0f);
             FActorSpawnParameters SpawnInfo1;
             GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-            if(GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall Above"));
-            }
+//            if(GEngine)
+//            {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall Above"));
+//            }
 
         }
 //        if((RoomLocationR[i] +1 < MaxRooms && RoomLayout[RoomLocationR[i]+1][RoomLocationC[i]] != 0))
@@ -284,10 +529,10 @@ void ALevelGenarator::DungeonLayout()
             FRotator Rotation1(0.0f, 0.0f, 0.0f);
             FActorSpawnParameters SpawnInfo1;
             GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-            if(GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawned Wall Below"));
-            }
+//            if(GEngine)
+//            {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawned Wall Below"));
+//            }
 
         }
 
@@ -310,5 +555,66 @@ void ALevelGenarator::DungeonLayout()
     
 
 
+}
+void ALevelGenarator::SpawnFloor(FVector vec)
+{
+    
+    if(GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawning Floor"));
+    }
+    UStaticMeshComponent* FloorMesh = NewObject<UStaticMeshComponent>(this);
+    FloorMesh->SetStaticMesh(Tile);
+    FloorMesh->RegisterComponent();
+    FloorMesh->SetMobility(EComponentMobility::Movable);
+    FloorMesh->SetWorldLocationAndRotation(vec, FRotator::ZeroRotator);
+    FloorMesh->SetMobility(EComponentMobility::Static);
+
+    
+}
+void ALevelGenarator::SpawnWall(FVector vec, FRotator rot)
+{
+    UStaticMeshComponent* WallMesh = NewObject<UStaticMeshComponent>(this);
+    WallMesh->SetStaticMesh(Wall);
+    WallMesh->RegisterComponent();
+    WallMesh->SetMobility(EComponentMobility::Movable);
+    WallMesh->SetWorldLocationAndRotation(vec, rot);
+    WallMesh->SetMobility(EComponentMobility::Static);
+    
+}
+
+void ALevelGenarator::CleanUp()
+{
+    //Free subarrays
+    for(int i = 0; i < MapBounds; i++)
+    {
+        if(MapTiles)
+        {
+            if(MapTiles[i])
+            {
+                FMemory::Free(MapTiles[i]);
+            }
+        }
+        
+    }
+    //Free overall array
+    if(MapTiles)
+    {
+        FMemory::Free(MapTiles);
+    }
+    
+    for(int i = 1; i <=RoomCount; i++)
+    {
+        if(RoomRows[i])
+        {
+            FMemory::Free(RoomRows[i]);
+        }
+        if(RoomCols[i])
+        {
+            FMemory::Free(RoomCols[i]);
+        }
+    }
+    
+    
 }
 

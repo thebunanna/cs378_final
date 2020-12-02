@@ -16,10 +16,10 @@ AWallTile::AWallTile()
         static ConstructorHelpers::FObjectFinder<UStaticMesh> WallAsset (TEXT("StaticMesh'/Game/MedievalDungeon/Meshes/Architecture/Dungeon/SM_Dungeon_Wall.SM_Dungeon_Wall'"));
         if (WallAsset.Succeeded())
             {
-                if(GEngine)
-                {
-                    GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Found Wall"));
-                }
+//                if(GEngine)
+//                {
+//                    GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Found Wall"));
+//                }
                 WallMesh->SetStaticMesh(WallAsset.Object);
             }
 

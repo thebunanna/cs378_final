@@ -22,10 +22,40 @@ public:
     int MaxRooms;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int MapBounds;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int RoomCount;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int MaxTilePerRoom;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int RoomStartRow;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int RoomStartCol;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int RoomEndRow;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int RoomEndCol;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UStaticMesh* Tile;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UStaticMesh* Wall;
+    
+    int** MapTiles;
+    
+    TMap<int, int> RoomTileCount;
+    
+    TMap<int, int*> RoomRows;
+    
+    TMap<int, int*> RoomCols;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,5 +67,24 @@ public:
     
     UFUNCTION(BlueprintCallable)
     void DungeonLayout();
+    
+    UFUNCTION(BlueprintCallable)
+    void SpawnFloor(FVector vec);
+    
+    UFUNCTION(BlueprintCallable)
+    void SpawnWall(FVector vec, FRotator rot);
+    
+    UFUNCTION(BlueprintCallable)
+    bool CheckValidSpot(int r, int c, int room);
+    
+    UFUNCTION(BlueprintCallable)
+    void PlaceRoomStarts();
+    
+    UFUNCTION()
+    void SetupMapData();
+    
+    UFUNCTION()
+    void CleanUp();
+    
 
 };
