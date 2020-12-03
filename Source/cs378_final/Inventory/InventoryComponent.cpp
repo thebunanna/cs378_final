@@ -53,11 +53,10 @@ bool UInventoryComponent::AddItemToInventoryByID(FName ID)
 
 void UInventoryComponent::Interact()
 {
-	if (GEngine) GEngine->AddOnScreenDebugMessage(1, 1.5f, FColor::White,
-			TEXT("INTERACTING"));
+	
 	if (CurrentInteractable)
 	{
-		CurrentInteractable->Interact(Cast<Acs378_PlayerController>(GetOwner()));
+		CurrentInteractable->Execute_Interact(Cast<UObject>(CurrentInteractable), Cast<Acs378_PlayerController>(GetOwner()));
 	}
 }
 

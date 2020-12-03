@@ -27,8 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Utils")
 		bool AddItemToInventoryByID(FName ID);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		class AInteractableBase* CurrentInteractable;
+	class IInteractableBase* CurrentInteractable;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		TArray<FInventoryItem> Inventory;

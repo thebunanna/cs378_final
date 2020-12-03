@@ -13,6 +13,9 @@ struct CS378_FINAL_API FInventoryItem : public FTableRowBase
 {
 	GENERATED_BODY()
 
+private:
+	
+
 public:
 	FInventoryItem();
 

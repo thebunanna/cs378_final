@@ -34,3 +34,11 @@ UInventoryComponent* Acs378_PlayerController::GetInventory()
 {
 	return this->Inv;
 }
+
+void Acs378_PlayerController::LoadInvWidget()
+{
+	if (IW == NULL) {
+		IW = CreateWidget<UInventoryWidget>(this, BP_InvWidget);
+		IW->LinkedInv = Inv;
+	}
+}
