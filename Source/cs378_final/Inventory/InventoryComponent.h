@@ -25,7 +25,12 @@ public:
 		void ReloadInventory();
 
 	UFUNCTION(BlueprintCallable, Category = "Utils")
-		bool AddItemToInventoryByID(FName ID);
+		bool AddItemToInventoryByID(FName ID, TSubclassOf<class AActor> base, ItemType Type);
+	UFUNCTION(BlueprintCallable, Category = "Utils")
+		bool RemoveFromInventory(FInventoryItem item, bool spawn);
+	UFUNCTION(BlueprintCallable, Category = "Utils")
+		bool UseItem(FInventoryItem item);
+
 
 	class IInteractableBase* CurrentInteractable;
 

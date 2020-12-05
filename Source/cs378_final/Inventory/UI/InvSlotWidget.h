@@ -30,4 +30,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		FInventoryItem RemoveFromInv();
+
+	UFUNCTION(BlueprintCallable)
+		FInventoryItem UseFromInv();
+
+private:
+	UInventoryComponent* GetInv();
+
+	void ForceReload();
 };

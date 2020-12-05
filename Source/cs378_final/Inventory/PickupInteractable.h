@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "InteractableBase.h"
+#include "InventoryItem.h"
 #include "PickupInteractable.generated.h"
 
 /**
  * 
- */
+ **/
 UCLASS()
 class CS378_FINAL_API APickupInteractable : public AActor, public IInteractableBase
 {
@@ -32,6 +33,7 @@ protected:
 		FString Name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Action;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		ItemType Type;
 
 };

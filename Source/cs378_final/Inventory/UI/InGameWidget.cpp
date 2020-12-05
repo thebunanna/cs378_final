@@ -17,7 +17,7 @@ FString UInGameWidget::GetText()
 		}
 		else {
 			UInventoryComponent* IController = pc->GetInventory();
-			if (IController->CurrentInteractable)
+			if (IController && IController->CurrentInteractable)
 				return IController->CurrentInteractable->GetInteractText();
 		}
 		

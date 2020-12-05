@@ -19,28 +19,64 @@ FReply UInvSlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, cons
 
 		RemoveFromInv();
 	}
+	else if (InMouseEvent.IsMouseButtonDown(FKey(TEXT("LeftMouseButton")))) {
+		UseFromInv();
+	}
 	return FReply::Handled();
 }
 
 FInventoryItem UInvSlotWidget::RemoveFromInv()
 {
+	UInventoryComponent* Inventory = GetInv();
+	if (Inventory == NULL)
+		return FInventoryItem();
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(3, 1.5f, FColor::White,
+	//	FString::FormatAsNumber(item.UID));
+	Inventory->RemoveFromInventory(item, true);
+
+
+	ForceReload();
+
+	return item;
+}
+
+FInventoryItem UInvSlotWidget::UseFromInv()
+{
+	UInventoryComponent* Inventory = GetInv();
+	if (Inventory == NULL)
+		return FInventoryItem();
+
+	Inventory->UseItem(item);
+	ForceReload();
+
+	return item;
+}
+
+UInventoryComponent* UInvSlotWidget::GetInv()
+{
 	UInventoryWidget* IW = inv;
 
 	if (IW == NULL) {
 		UE_LOG(LogTemp, Warning, TEXT("Inventory Not Existing!"));
-		return FInventoryItem();
+		return NULL;
 	}
 
 	UInventoryComponent* Inventory = IW->LinkedInv;//Cast<UInventoryComponent>(IW->LinkedInv.Get());
 	if (Inventory == NULL) {
 		UE_LOG(LogTemp, Warning, TEXT("bp not set for this inv slot!"));
-		return FInventoryItem();
+		return NULL;
 	}
-	//if (GEngine) GEngine->AddOnScreenDebugMessage(3, 1.5f, FColor::White,
-	//	FString::FormatAsNumber(item.UID));
-	Inventory->Inventory.Remove(item);
+	return Inventory;
+}
+
+void UInvSlotWidget::ForceReload()
+{
+	UInventoryWidget* IW = inv;
+
+	if (IW == NULL) {
+		UE_LOG(LogTemp, Warning, TEXT("Inventory Not Existing!"));
+		return;
+	}
 
 	IW->LoadInventory();
-
-	return item;
 }

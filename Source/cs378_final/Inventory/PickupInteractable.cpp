@@ -21,7 +21,7 @@ void APickupInteractable::Interact_Implementation(APlayerController* Controller)
 {
 	if (Controller) {
 		UInventoryComponent* InvController = Cast<Acs378_PlayerController>(Controller)->GetInventory();
-		if (InvController->AddItemToInventoryByID(ItemID))
+		if (InvController->AddItemToInventoryByID(ItemID, this->GetClass(), this->Type))
 			Destroy();
 	}
 	

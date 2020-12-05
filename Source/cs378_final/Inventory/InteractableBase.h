@@ -28,7 +28,7 @@ public:
 		void Interact(APlayerController* Controller);
 
 	virtual void Interact_Implementation(APlayerController* Controller);
-
+		
 	UFUNCTION()
 		virtual FString GetInteractText() const;
 };
