@@ -21,20 +21,23 @@ public:
 	UPlayerData();
 
 	UPROPERTY(Category = Armor, EditAnywhere, BlueprintReadWrite)
-		TMap<EArmorPartEnum, FString> SavedArmor;
+		TMap<EArmorPartEnum, TSubclassOf<AArmor>> SavedArmor;
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
 		bool Gender;
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
-		int Hair;
+		USkeletalMesh* HairMesh;
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
-		int Head;
+		USkeletalMesh* HeadMesh;
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
-		int Eyebrows;
+		USkeletalMesh* EyebrowsMesh;
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
-		int FacialHair;
+		USkeletalMesh* FacialHairMesh;
+
+	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
+		UMaterialInstanceDynamic* Material;
 };

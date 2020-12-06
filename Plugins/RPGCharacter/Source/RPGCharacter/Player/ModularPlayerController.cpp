@@ -18,11 +18,11 @@ void AModularPlayerController::SetupInputComponent()
 	InputComponent->BindAction("AttackAction", IE_Pressed, this, &AModularPlayerController::Attack);
 	InputComponent->BindAction("BlockAction", IE_Pressed, this, &AModularPlayerController::Block);
 	InputComponent->BindAction("BlockAction", IE_Released, this, &AModularPlayerController::StopBlock);
-
-	InputComponent->BindAction("1", IE_Pressed, this, &AModularPlayerController::EquipNone);
-	InputComponent->BindAction("2", IE_Pressed, this, &AModularPlayerController::EquipLight);
-	InputComponent->BindAction("3", IE_Pressed, this, &AModularPlayerController::EquipHeavy);
 }
+
+// ------------------
+// Character Controls
+// ------------------
 
 void AModularPlayerController::Forward(float value)
 {
@@ -53,10 +53,25 @@ void AModularPlayerController::CameraY(float value)
 
 void AModularPlayerController::CameraX(float value)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacter* character = this->GetCharacter();
 	if (character)
 	{
-		character->CameraXBPEvent(value);
+		if (character->IsA(AModularPlayerCharacter::StaticClass()))
+		{
+			AModularPlayerCharacter* ModularCharacter = Cast<AModularPlayerCharacter>(character);
+			if (ModularCharacter)
+			{
+				ModularCharacter->CameraXBPEvent(value);
+			}
+		}
+		else if (character->IsA(ACharacterCreator::StaticClass()))
+		{
+			ACharacterCreator* CreateCharacter = Cast<ACharacterCreator>(character);
+			if (CreateCharacter)
+			{
+				CreateCharacter->RotateFace(value);
+			}
+		}
 	}
 }
 
@@ -87,9 +102,46 @@ void AModularPlayerController::StopBlock()
 	}
 }
 
-void AModularPlayerController::ChangeGender(bool gender)
+void AModularPlayerController::EquipArmor(TSubclassOf<AArmor> armor)
 {
 	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	if (character)
+	{
+		character->EquipArmor(armor);
+	}
+}
+
+void AModularPlayerController::Save()
+{
+	ACharacter* character = this->GetCharacter();
+	if (character)
+	{
+		if (character->IsA(AModularPlayerCharacter::StaticClass()))
+		{
+			AModularPlayerCharacter* ModularCharacter = Cast<AModularPlayerCharacter>(character);
+			if (ModularCharacter)
+			{
+				ModularCharacter->SaveBPEvent();
+			}
+		}
+		else if (character->IsA(ACharacterCreator::StaticClass()))
+		{
+			ACharacterCreator* CreateCharacter = Cast<ACharacterCreator>(character);
+			if (CreateCharacter)
+			{
+				CreateCharacter->Save();
+			}
+		}
+	}
+}
+
+// ---------------------------
+// Character Creation Controls
+// ---------------------------
+
+void AModularPlayerController::ChangeGender(bool gender)
+{
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
 		character->ChangeGender(gender);
@@ -98,7 +150,7 @@ void AModularPlayerController::ChangeGender(bool gender)
 
 void AModularPlayerController::ChangeHair(float value)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
 		character->ChangeHair(value);
@@ -107,7 +159,7 @@ void AModularPlayerController::ChangeHair(float value)
 
 void AModularPlayerController::ChangeHead(float value)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
 		character->ChangeHead(value);
@@ -116,7 +168,7 @@ void AModularPlayerController::ChangeHead(float value)
 
 void AModularPlayerController::ChangeEyebrows(float value)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
 		character->ChangeEyebrows(value);
@@ -125,45 +177,36 @@ void AModularPlayerController::ChangeEyebrows(float value)
 
 void AModularPlayerController::ChangeFacialHair(float value)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
 		character->ChangeFacialHair(value);
 	}
 }
 
-void AModularPlayerController::Save()
+void AModularPlayerController::SkinColor(float r, float g, float b)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
-		character->SaveBPEvent();
+		character->SkinColor(r, g, b);
 	}
 }
 
-void AModularPlayerController::EquipNone()
+void AModularPlayerController::PaintColor(float r, float g, float b)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
-		character->EquipNoneArmor();
+		character->PaintColor(r, g, b);
 	}
 }
 
-void AModularPlayerController::EquipLight()
+void AModularPlayerController::HairColor(float r, float g, float b)
 {
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+	ACharacterCreator* character = Cast<ACharacterCreator>(this->GetCharacter());
 	if (character)
 	{
-		character->EquipLightArmor();
-	}
-}
-
-void AModularPlayerController::EquipHeavy()
-{
-	AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
-	if (character)
-	{
-		character->EquipHeavyArmor();
+		character->HairColor(r, g, b);
 	}
 }
