@@ -21,27 +21,6 @@ ALevelGenarator::ALevelGenarator()
     
 //    MAKE SURE TO FREE RESOURCES
     
-    //Allocate MapTiles
-//    MapTiles = (int **)FMemory::Malloc(sizeof(int)*MapBounds);
-//    for(int i = 0; i < MapBounds; i++)
-//    {
-//        if(MapTiles)
-//        {
-//            MapTiles[i] = (int *)FMemory::Malloc(sizeof(int)*MapBounds);
-//        }
-//    }
-//
-//    //Allocate Tile Location Info
-//    for(int i = 0; i<RoomCount; i++)
-//    {
-//        RoomTileCount.Add(i, 0);
-//        int *RowArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
-//        int *ColArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
-//        RoomRows.Add(i, RowArr);
-//        RoomCols.Add(i, ColArr);
-//
-//    }
-    
     
     
     //Get Meshes for building dungeon
@@ -136,10 +115,25 @@ void ALevelGenarator::BeginPlay()
     
     
     
+//    SetupMapData();
+//    DungeonLayout();
+//    GrowRooms();
+//    PlaceWalls();
+}
+
+void ALevelGenarator::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
     SetupMapData();
     DungeonLayout();
     GrowRooms();
     PlaceWalls();
+//    PlaceSpawn();
+}
+
+void ALevelGenarator::PostActorConstruction()
+{
+    Super::PostActorConstruction();
 }
 
 // Called every frame
@@ -278,7 +272,7 @@ void ALevelGenarator::PlaceWalls()
                 }
 //
                 //LeftCol
-                if(WallCheck(i,j,0,1))
+                if(WallCheck(i,j,0,-1))
                 {
                     FVector Location(0.0f+(600.f*i), 0.0f+(600.f*j), 70.f);
                     FRotator Rotation(0.0f, -90.0f, 0.0f);
@@ -459,6 +453,21 @@ int* ALevelGenarator::GetEdgeTile(int CurrentRoom)
 //        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("OUT OF WHILE LOOP GET EDGE"));
 //    }
     return Coords;
+}
+void ALevelGenarator::PlaceSpawn()
+{
+    //SPAWN PLAYER START
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.Owner = this;
+    SpawnInfo.Instigator = NULL;
+    SpawnInfo.bDeferConstruction = false;
+    FVector Loc(50.0f+600.f*RoomStartRow, 50.0f+600.f*RoomStartCol, 150.0f);
+
+//    APlayerStart* PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
+
+    GetWorld()->SpawnActor<APlayerStart>(Loc, FRotator::ZeroRotator, SpawnInfo);
+//
+
 }
 bool ALevelGenarator::PlaceAdditionalRoom(int Row, int Col, int CurrentRoom)
 {
@@ -681,7 +690,7 @@ void ALevelGenarator::BuildPath(int r, int c, int room1, int room2)
 //        {
 //            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("BUILD PATH"));
 //        }
-        FVector FloorLocation(0.f+600.f*r,0.f+600.f*c,150.f);
+        FVector FloorLocation(0.f+600.f*r,0.f+600.f*c,75.f);
         SpawnFloor(FloorLocation);
         UpdateAdjMatrix(r, c, room1, room2);
         
@@ -843,7 +852,7 @@ void ALevelGenarator::DungeonLayout()
 ////    APlayerStart* PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
 //
 //    GetWorld()->SpawnActor<APlayerStart>(Loc, FRotator::ZeroRotator, SpawnInfo);
-//
+////
 
 
 }

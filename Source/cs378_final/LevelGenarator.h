@@ -97,6 +97,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+    
+    virtual void PostInitializeComponents() override;
+    
+    virtual void PostActorConstruction() override;
 
 public:	
 	// Called every frame
@@ -161,5 +165,8 @@ public:
     
     UFUNCTION()
     bool WallCheck(int r, int c, int deltar, int deltac);
+    
+    UFUNCTION()
+    void PlaceSpawn();
 
 };
