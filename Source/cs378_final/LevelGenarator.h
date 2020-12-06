@@ -6,6 +6,28 @@
 #include "GameFramework/Actor.h"
 #include "LevelGenarator.generated.h"
 
+
+USTRUCT()
+struct FMap2dArray{
+    GENERATED_BODY()
+public:
+
+    TArray<int> Ar;
+
+    int operator[] (int32 i) {
+        return Ar[i];
+    }
+    
+    void Set(int i, int j){
+        Ar[i]=j;
+    }
+
+    void Add(int i) {
+        Ar.Add(i);
+    }
+};
+
+
 UCLASS()
 class CS378_FINAL_API ALevelGenarator : public AActor
 {
@@ -48,13 +70,22 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UStaticMesh* Wall;
     
+    UPROPERTY()
+    bool RoomStartDone;
+    
     int** MapTiles;
     
+    int** AdjMatrix;
+    
+    UPROPERTY()
     TMap<int, int> RoomTileCount;
     
     TMap<int, int*> RoomRows;
     
     TMap<int, int*> RoomCols;
+    
+    UPROPERTY()
+    TArray<FMap2dArray> Check2;
 
 
 protected:
@@ -86,5 +117,31 @@ public:
     UFUNCTION()
     void CleanUp();
     
+    UFUNCTION()
+    void GrowRooms();
+    
+    UFUNCTION()
+    bool ValidEdgeTileCheck(int r, int c, int room);
+    
+    UFUNCTION()
+    bool CheckBounds(int r, int c);
+    
+//    UFUNCTION()
+    int* GetEdgeTile(int Room);
+    
+    UFUNCTION()
+    bool PlaceAdditionalRoom(int r, int c, int room);
+    
+    UFUNCTION()
+    void UpdateMapData(int r, int c, int room);
+    
+    UFUNCTION()
+    bool UpdateAdjMatrix(int r, int c, int room1, int room2);
+    
+    UFUNCTION()
+    bool PathExists(int room1, int room2);
+    
+    UFUNCTION()
+    void BuildPath(int r, int c, int room1, int room2);
 
 };

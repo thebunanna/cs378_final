@@ -13,11 +13,11 @@ ALevelGenarator::ALevelGenarator()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
     MinRooms = 8;
-    MaxRooms = 20;
+    MaxRooms = 10;
     MapBounds = MaxRooms*2;
     RoomCount = FMath::RandRange(MinRooms, MaxRooms);
     MaxTilePerRoom = MapBounds;
-    
+    RoomStartDone = false;
     
 //    MAKE SURE TO FREE RESOURCES
     
@@ -65,7 +65,8 @@ ALevelGenarator::ALevelGenarator()
         }
         Wall = WallAsset.Object;
     }
-
+    
+    
 }
 
 // Called when the game starts or when spawned
@@ -115,8 +116,26 @@ void ALevelGenarator::BeginPlay()
 //        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Spawned LevelTile"));
 //    }
     
-    SetupMapData();
-    DungeonLayout();
+    
+    
+    
+    TArray<FMap2dArray> MapStuffs;
+    Check2.Add(FMap2dArray());
+    Check2[0].Add(0);
+    Check2[0].Set(0, 1209);
+    
+    if(GEngine)
+    {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Value: %d"), Check2[0][0]));
+    }
+    
+    
+    
+    
+    
+//    SetupMapData();
+//    DungeonLayout();
+//    GrowRooms();
 }
 
 // Called every frame
@@ -127,30 +146,57 @@ void ALevelGenarator::Tick(float DeltaTime)
 }
 void ALevelGenarator::SetupMapData()
 {
-        //Allocate MapTiles
-        MapTiles = (int **)FMemory::Malloc(sizeof(int)*MapBounds);
-        for(int i = 0; i < MapBounds; i++)
+     
+    //Allocate MapTiles
+    MapTiles = (int **)FMemory::Malloc(sizeof(int)*MapBounds);
+    for(int i = 0; i < MapBounds; i++)
+    {
+        if(MapTiles)
         {
-            if(MapTiles)
+            MapTiles[i] = (int *)FMemory::Malloc(sizeof(int)*MapBounds);
+            for(int j = 0; j < MapBounds; j++)
             {
-                MapTiles[i] = (int *)FMemory::Malloc(sizeof(int)*MapBounds);
+                MapTiles[i][j] = 0;
             }
         }
-    
-        //Allocate Tile Location Info
-        for(int i = 1; i<=RoomCount; i++)
+    }
+
+    //Allocate Tile Location Info
+    for(int i = 1; i<=RoomCount; i++)
+    {
+        RoomTileCount.Add(i, 0);
+        int *RowArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
+        int *ColArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
+        for(int j = 0; j < MaxTilePerRoom; j++)
         {
-            RoomTileCount.Add(i, 0);
-            int *RowArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
-            int *ColArr = (int *)FMemory::Malloc(sizeof(int)*MaxTilePerRoom);
-            RoomRows.Add(i, RowArr);
-            RoomCols.Add(i, ColArr);
-    
+            RowArr[j] = 0;
+            ColArr[j] = 0;
         }
+        RoomRows.Add(i, RowArr);
+        RoomCols.Add(i, ColArr);
+    }
+    
+    //Allocate Adjacency Matrix
+    AdjMatrix = (int**)FMemory::Malloc(sizeof(int)*RoomCount);
+    for(int i = 0; i < RoomCount; i++)
+    {
+        if(AdjMatrix)
+        {
+            AdjMatrix[i] = (int *)FMemory::Malloc(sizeof(int)*RoomCount);
+            for(int j = 0; j < RoomCount; j++)
+            {
+                AdjMatrix[i][j] = 0;
+            }
+
+        }
+    }
+    
+    
 }
 
 void ALevelGenarator::PlaceRoomStarts()
 {
+    
     for(int RoomNum = 1; RoomNum <= RoomCount; RoomNum++)
     {
         
@@ -179,13 +225,11 @@ void ALevelGenarator::PlaceRoomStarts()
                 RoomTileCount.Add(RoomNum, 1);
                 if(RoomRows.Contains(RoomNum))
                 {
-                    int *temp = RoomRows[RoomNum];
-                    temp[0] = RowVal;
+                    RoomRows[RoomNum][0] = RowVal;
                 }
                 if(RoomCols.Contains(RoomNum))
                 {
-                    int *temp = RoomCols[RoomNum];
-                    temp[0] = ColVal;
+                    RoomCols[RoomNum][0] = ColVal;
                 }
             }
             FVector FloorLocation(0.f+600.f*RowVal,0.f+600.f*ColVal,75.f);
@@ -210,27 +254,308 @@ void ALevelGenarator::PlaceRoomStarts()
             }
         }
     }
-    CleanUp();
     
+    
+    //debug
+//    for(int i = 1; i <=RoomCount; i++ )
+//    {
+//        if(GEngine)
+//        {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("ROOM: %d COL: %d"), i, RoomRows[i][0]));
+//        }
+//        if(GEngine)
+//        {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("ROOM: %d COL: %d"), i, RoomCols[i][0]));
+//        }
+//
+//    }
+    
+    
+    
+//    CleanUp();
+    
+}
+bool ALevelGenarator::UpdateAdjMatrix(int r, int c, int room1, int room2)
+{
+    MapTiles[r][c] = -1;
+    AdjMatrix[room1][room2] = 1;
+    AdjMatrix[room2][room1] = 1;
+    return true;
+}
+
+int* ALevelGenarator::GetEdgeTile(int CurrentRoom)
+{
+    static int Coords[2];
+    Coords[0] = -1;
+    Coords[1] = -1;
+    
+    //Choose random tile trying to find edge of this room
+    int idx = 0;
+    
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("MAXTILEPERROOM: %d"), MaxTilePerRoom));
+//    }
+    
+    while (idx < MaxTilePerRoom)
+    {
+        int CurrentNumTiles = RoomTileCount[CurrentRoom];
+        if(CurrentNumTiles < MaxTilePerRoom)
+        {
+            int TileSelection = FMath::RandRange(0, CurrentNumTiles-1);
+            int CurrentRow = RoomRows[CurrentRoom][TileSelection];
+            int CurrentCol = RoomCols[CurrentRoom][TileSelection];
+            if(ValidEdgeTileCheck(CurrentRow, CurrentCol, CurrentRoom))
+            {
+                Coords[0] = CurrentRow;
+                Coords[1] = CurrentCol;
+                return Coords;
+            }
+        } else
+        {
+            return Coords;
+        }
+        idx+=1;
+    }
+    
+    //debug
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("OUT OF WHILE LOOP GET EDGE"));
+//    }
+    return Coords;
+}
+bool ALevelGenarator::PlaceAdditionalRoom(int Row, int Col, int CurrentRoom)
+{
+    
+    int RDirection[] = {0,0,1,-1};
+    int CDirection[] = {1,-1,0,0};
+    
+    for(int i = 0; i < 4; i++)
+    {
+        //Choose direction
+        int DirectionIndex = FMath::RandRange(0, 3);
+        int ProposedR = Row+RDirection[i];
+        int ProposedC = Col+CDirection[i];
+        if(CheckValidSpot(ProposedR, ProposedC, CurrentRoom))
+        {
+            FVector FloorLocation(0.f+600.f*ProposedR,0.f+600.f*ProposedC,75.f);
+            SpawnFloor(FloorLocation);
+            UpdateMapData(ProposedR, ProposedC, CurrentRoom);
+//            GoneWithoutPlacing = 0;
+//
+//            if(GEngine)
+//            {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Growing Room"));
+//            }
+            return true;
+        }
+    }
+    //debug
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("NO ROOM PLACED"));
+//    }
+    return false;
+    
+}
+
+void ALevelGenarator::UpdateMapData(int Row, int Col, int CurrentRoom)
+{
+    int Tiles = RoomTileCount[CurrentRoom]+1;
+    RoomTileCount.Add(CurrentRoom, Tiles);
+    RoomRows[CurrentRoom][Tiles] = Row;
+    RoomCols[CurrentRoom][Tiles] = Col;
+    MapTiles[Row][Col] = CurrentRoom;
+    
+}
+
+void ALevelGenarator::GrowRooms()
+{
+    int iterations = 0;
+    int CurrentRoom = 1;
+    int GoneWithoutPlacing = 0;
+    bool ValidFreeSpace = true;
+    
+    int roomsmade = 0;
+    int noedge = 0;
+    
+//    (MapBounds-MinRooms)*(MapBounds-MinRooms)
+    while(ValidFreeSpace && iterations < (MapBounds+2)*(MapBounds*2))
+    {
+        if(CurrentRoom > RoomCount)
+        {
+            CurrentRoom = 1;
+        }
+        //Roll to grow this room or not
+        //FIX OR CHANGE TODO
+        int PlaceRoom = FMath::RandRange(1, 1);
+        if(PlaceRoom)
+        {
+            //debug
+//            if(GEngine)
+//            {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("Try Place Room: %d"), iterations));
+//            }
+            
+            int* Coords = GetEdgeTile(CurrentRoom);
+            int Row = Coords[0];
+            int Col = Coords[1];
+            //Use EdgeTile to select a spot to grow
+            if(Row != -1 && Col != -1)
+            {
+
+//                if(GEngine)
+//                {
+//                    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("EDGE FOUND"));
+//                }
+                
+                if(PlaceAdditionalRoom(Row, Col, CurrentRoom))
+                {
+                    //debug
+//                    if(GEngine)
+//                    {
+//                        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("PLACED A ROOM: %d"), iterations));
+//                    }
+                    roomsmade = roomsmade+1;
+                    GoneWithoutPlacing = 0;
+                }
+                else
+                    GoneWithoutPlacing+=1;
+            } else
+            {
+                noedge = noedge +1;
+            }
+            iterations+=1;
+        }
+        //Breaking out if we havent been able to place a room;
+        if(GoneWithoutPlacing == RoomCount*2){
+            //debug
+//            if(GEngine)
+//            {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("GONE WITHOUT PLACING"));
+//            }
+            ValidFreeSpace = false;
+        }
+        CurrentRoom+=1;
+    }
+    //debug
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("TOTAL ROOMS MADE: %d"), roomsmade));
+//    }
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("TOTAL EDGES NOT FOUND: %d"), noedge));
+//    }
+    //CleanUp();
+}
+bool ALevelGenarator::ValidEdgeTileCheck(int r, int c, int room)
+{
+    int RDirection[] = {0,0,1,-1};
+    int CDirection[] = {1,-1,0,0};
+    for(int i = 0; i < 4; i++)
+    {
+        if(CheckBounds(r+RDirection[i], c+CDirection[i]) && this->CheckValidSpot(r+RDirection[i], c+CDirection[i], room))
+        {
+            if(MapTiles[r][c] == room)
+                return true;
+        }
+    }
+    return false;
+    
+}
+
+//TODO
+//MAKE CHECK BOUNDS FUNCTION/BREAK SOME FUNCTIONS UP
+
+
+//MAIN QUESTIONS
+//1 HOW TO DO LEVEL SPAWN ACRTOR? SHOULD I JUST TELEPORT CHARACTER
+//2 TRACK DOWN A BUG CASUSING CRASH WHEN EXITING GAME SOMETHING TO DO WITH MEMORY ALLOCATION?
+//3 GAME AWARDS THING WE PRESENTING ON MONDAY? DO WE NEED TO PRESENT EARLIER?
+
+bool ALevelGenarator::CheckBounds(int r, int c)
+{
+    if(r < 0)
+        return false;
+    if(c < 0)
+        return false;
+    if(r >= MapBounds)
+        return false;
+    if(c >= MapBounds)
+        return false;
+    return true;
+}
+
+bool ALevelGenarator::PathExists(int room1, int room2)
+{
+    if(room1 < 0 || room2 < 0)
+    {
+        if(GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("NEGATIVE ROOM"));
+        }
+        
+    }
+    if(room1 >= RoomCount || room2 >=RoomCount)
+    {
+        if(GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("BIG ROOM NUM"));
+        }
+    }
+//    if(AdjMatrix[room1][room2] ==1 || AdjMatrix[room2][room1] ==1)
+//    {
+//        return true;
+//    }
+    return false;
+}
+
+void ALevelGenarator::BuildPath(int r, int c, int room1, int room2)
+{
+    if(r == 0 && c== 0)
+    {
+        FVector FloorLocation(0.f+600.f*r,0.f+600.f*c,75.f);
+        SpawnFloor(FloorLocation);
+        UpdateAdjMatrix(r, c, room1, room2);
+        
+        
+    }
 }
 bool ALevelGenarator::CheckValidSpot(int r, int c, int room)
 {
     int RDirection[] = {0,0,1,-1};
     int CDirection[] = {1,-1,0,0};
     
-    if (r < 0 || r>= MapBounds || c <0 || c>=MapBounds){
+    
+    if(!CheckBounds(r, c))
+    {
         return false;
     }
     
     
     if(MapTiles[r][c] == 0)
     {
+//        TODO FIX
         for(int i = 0; i < 4; i++)
         {
-            int NearbyValue = MapTiles[r+RDirection[i]][c+CDirection[i]];
-            if(NearbyValue != 0 && NearbyValue!= room)
+            if(CheckBounds(r+RDirection[i],c+CDirection[i]))
             {
-                return false;
+                int NearbyValue = MapTiles[r+RDirection[i]][c+CDirection[i]];
+                if(NearbyValue != 0 && NearbyValue!= room)
+                {
+//                    if(RoomStartDone && !PathExists(NearbyValue, room))
+//                    {
+//                        if(GEngine)
+//                        {
+//                            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("NO PATH"));
+//                        }
+////                        //MAKE PATH
+////                        BuildPath(r, c, NearbyValue, room);
+//                    }
+                    return false;
+                }
             }
         }
         return true;
@@ -268,49 +593,7 @@ void ALevelGenarator::DungeonLayout()
     //Map with row coords
     //Map with col coords
     PlaceRoomStarts();
-    
-    
-    
-    
-    return;
-    
-    
-    
-    
-    
-    
-    
-    int value = 5;
-    int *Rooms = (int *)FMemory::Malloc(sizeof(int)*value);
-    for (int idx = 0; idx < 5; idx++)
-    {
-        Rooms[idx] = 0;
-        
-
-    }
-    
-    int **arr = (int **)FMemory::Malloc(sizeof(int)*value);
-    for(int i = 0; i < value; i++)
-    {
-        arr[i] = (int *)FMemory::Malloc(sizeof(int)*value);
-    }
-    for(int r = 0; r < value; r++)
-    {
-        for(int c = 0; c < value; c++)
-        {
-            arr[r][c] = 0;
-            if(GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Yup"));
-            }
-        }
-    }
-    
-    TMap<int, int**> FruitMap;
-    FruitMap.Add(5, arr);
-
-
-
+    RoomStartDone = true;
     
     
     
@@ -322,247 +605,63 @@ void ALevelGenarator::DungeonLayout()
     
     
     
-    RoomCount = FMath::RandRange(MinRooms, MaxRooms);
-//    if(GEngine)
+//    int value = 5;
+//    int *Rooms = (int *)FMemory::Malloc(sizeof(int)*value);
+//    for (int idx = 0; idx < 5; idx++)
 //    {
-//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("Number of rooms: %d"), RoomCount));
+//        Rooms[idx] = 0;
+//
+//
 //    }
-    
-    RoomStartRow = FMath::RandRange(0, MaxRooms-1);
-    RoomStartCol = FMath::RandRange(0, MaxRooms-1);
-
-    //int RoomLayout[MaxRooms*2][MaxRooms*2];
-    int RoomLayout[40][40];
-    RoomLayout[RoomStartRow][RoomStartCol] = 1;
-    
-    int RoomLocationR[13];
-    int RoomLocationC[13];
-    
-    int currentRow = RoomStartRow;
-    int currentCol = RoomStartCol;
-    int NewRow = 0;
-    int NewCol = 0;
-    
-    RoomLocationR[0] = currentRow;
-    RoomLocationC[0] = currentCol;
-    
-    for (int idx = 0; idx < RoomCount; idx++)
-    {
-        bool validSpot = false;
-        while(!validSpot)
-        {
-            int Axis = FMath::RandRange(0, 1);
-            int Direction = FMath::RandRange(0, 1);
-            if (Axis == 0)
-            {
-                if (Direction == 0)
-                {
-                    if(RoomLayout[currentRow+1][currentCol] != 1)
-                    {
-                        validSpot = true;
-                        NewRow =currentRow+1;
-                        NewCol = currentCol;
-                    }
-                    
-                } else
-                {
-                    if(RoomLayout[currentRow-1][currentCol] != 1)
-                    {
-                        validSpot = true;
-                        NewRow = currentRow-1;
-                        NewCol = currentCol;
-                    }
-                    
-                }
-            } else
-            {
-                if (Direction == 0)
-                {
-                    if(RoomLayout[currentRow][currentCol+1] != 1)
-                    {
-                        validSpot = true;
-                        NewRow =currentRow;
-                        NewCol = currentCol+1;
-                    }
-                    
-                } else
-                {
-                    if(RoomLayout[currentRow][currentCol-1] != 1)
-                    {
-                        validSpot = true;
-                        NewRow = currentRow;
-                        NewCol = currentCol-1;
-                    }
-                    
-                }
-            }
-        }
-        RoomLayout[NewRow][NewCol] = 1;
-        currentRow = NewRow;
-        currentCol = NewCol;
-        RoomLocationR[idx+1] = currentRow;
-        RoomLocationC[idx+1] = currentCol;
-        
-    }
-    
-    
-    int LayoutTest[][5] = { {1, 1, 1,0,0}, {1, 0, 0,0,0}, {1,0,0,0,0}, {1,1,1,0,0},{1,0,0,0,0}};
-
-
-      RoomCount = 9;
-    MaxRooms = 5;
-//      RoomLocationR[13];
-//      RoomLocationC[13];
-      RoomLocationR[0] = 0;
-      RoomLocationC[0] = 0;
-    
-      RoomLocationR[1] = 0;
-      RoomLocationC[1] = 1;
-    
-      RoomLocationR[2] = 0;
-      RoomLocationC[2] = 2;
-    
-    RoomLocationR[3] = 1;
-    RoomLocationC[3] = 0;
-    
-    RoomLocationR[4] = 2;
-    RoomLocationC[4] = 0;
-    
-    RoomLocationR[5] = 3;
-    RoomLocationC[5] = 0;
-    
-    RoomLocationR[6] = 3;
-    RoomLocationC[6] = 1;
-    
-    RoomLocationR[7] = 3;
-    RoomLocationC[7] = 2;
-    
-    RoomLocationR[8] = 4;
-    RoomLocationC[8] = 0;
-    
-//    RoomLocationR[9] = 0;
-//    RoomLocationC[9] = 3;
 //
-//    RoomLocationR[10] = 0;
-//    RoomLocationC[10] = 4;
-//
-//    RoomLocationR[11] = 1;
-//    RoomLocationC[11] = 4;
-//
-//    RoomLocationR[12] = 2;
-//    RoomLocationC[12] = 4;
-    
-    
-    
-    for (int i = 0; i < RoomCount; i++)
-    {
-//        if(GEngine)
+//    int **arr = (int **)FMemory::Malloc(sizeof(int)*value);
+//    for(int i = 0; i < value; i++)
+//    {
+//        arr[i] = (int *)FMemory::Malloc(sizeof(int)*value);
+//    }
+//    for(int r = 0; r < value; r++)
+//    {
+//        for(int c = 0; c < value; c++)
 //        {
-//            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Blue, FString::Printf(TEXT("%d"), RoomLocationR[i]));
-//            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%d"), RoomLocationC[i]));
+//            arr[r][c] = 0;
+//            if(GEngine)
+//            {
+//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Yup"));
+//            }
 //        }
-        FVector Location(0.0f+600.f*RoomLocationR[i], 0.0f+600.f*RoomLocationC[i], 100.0f);
-        FRotator Rotation(0.0f, 0.0f, 0.0f);
-        FActorSpawnParameters SpawnInfo;
-        GetWorld()->SpawnActor<ALevelTile>(Location, Rotation, SpawnInfo);
-        if(GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Spawned Room: %d"), i));
-        }
-        
-        //CHECK TO RIGHT COL
-        if((RoomLocationC[i] +1 < MaxRooms*2 && LayoutTest[RoomLocationR[i]][RoomLocationC[i]+1] == 0)|| RoomLocationC[i]+1 >=MaxRooms*2)
-        {
-            FVector Location1(0.0f+600.f*RoomLocationR[i], 0.0f+600.f*(RoomLocationC[i]+1), 120.0f);
-            FRotator Rotation1(0.0f, -90.0f, 0.0f);
-            FActorSpawnParameters SpawnInfo1;
-            GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-//            if(GEngine)
-//            {
-//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall Right"));
-//            }
-
-        }
-
-        //CHECK TO LEFT COL
-       if((RoomLocationC[i] -1 >=0 && LayoutTest[RoomLocationR[i]][RoomLocationC[i]-1] == 0)||
-          RoomLocationC[i]-1 < 0)
-       {
-           FVector Location1(0.0f+600.f*RoomLocationR[i], 0.0f+600.f*(RoomLocationC[i]), 120.0f);
-           FRotator Rotation1(0.0f, -90.0f, 0.0f);
-           FActorSpawnParameters SpawnInfo1;
-           GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-//           if(GEngine)
-//           {
-//               GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("Spawned Wall Left"));
-//           }
-
-       }
-
-        //CHECK TO ABOVE ROW
-        if((RoomLocationR[i] +1 < MaxRooms*2 && LayoutTest[RoomLocationR[i]+1][RoomLocationC[i]] == 0) || RoomLocationR[i]+1 >=MaxRooms*2)
-        {
-            FVector Location1(0.0f+600.f*(RoomLocationR[i]+1), 0.0f+600.f*RoomLocationC[i], 120.0f);
-            FRotator Rotation1(0.0f, 0.0f, 0.0f);
-            FActorSpawnParameters SpawnInfo1;
-            GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-//            if(GEngine)
-//            {
-//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Yellow, TEXT("Spawned Wall Above"));
-//            }
-
-        }
-//        if((RoomLocationR[i] +1 < MaxRooms && RoomLayout[RoomLocationR[i]+1][RoomLocationC[i]] != 0))
-//        {
-//            if(GEngine)
-//            {
-//                GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("BLOCKED"));
-//            }
+//    }
 //
-//        }
-        
-
-        //CHECK TO BELOW ROW
-        if((RoomLocationR[i] -1 >=0 && LayoutTest[RoomLocationR[i]-1][RoomLocationC[i]] == 0) || RoomLocationR[i]-1 < 0)
-        {
-            FVector Location1(0.0f+600.f*(RoomLocationR[i]), 0.0f+600.f*RoomLocationC[i], 120.0f);
-            FRotator Rotation1(0.0f, 0.0f, 0.0f);
-            FActorSpawnParameters SpawnInfo1;
-            GetWorld()->SpawnActor<AWallTile>(Location1, Rotation1, SpawnInfo1);
-//            if(GEngine)
-//            {
-//                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawned Wall Below"));
-//            }
-
-        }
+//    TMap<int, int**> FruitMap;
+//    FruitMap.Add(5, arr);
 
 
 
-
-
-    }
     
-    //SPAWN PLAYER START
-    FActorSpawnParameters SpawnInfo;
-    SpawnInfo.Owner = this;
-    SpawnInfo.Instigator = NULL;
-    SpawnInfo.bDeferConstruction = false;
-    FVector Loc(50.0f+600.f*RoomLocationR[0], 50.0f+600.f*RoomLocationC[0], 150.0f);
-     
-//    APlayerStart* PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
     
-    GetWorld()->SpawnActor<APlayerStart>(Loc, FRotator::ZeroRotator, SpawnInfo);
     
+    return;
+    
+//    //SPAWN PLAYER START
+//    FActorSpawnParameters SpawnInfo;
+//    SpawnInfo.Owner = this;
+//    SpawnInfo.Instigator = NULL;
+//    SpawnInfo.bDeferConstruction = false;
+//    FVector Loc(50.0f+600.f*RoomLocationR[0], 50.0f+600.f*RoomLocationC[0], 150.0f);
+//
+////    APlayerStart* PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
+//
+//    GetWorld()->SpawnActor<APlayerStart>(Loc, FRotator::ZeroRotator, SpawnInfo);
+//
 
 
 }
 void ALevelGenarator::SpawnFloor(FVector vec)
 {
     
-    if(GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawning Floor"));
-    }
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Spawning Floor"));
+//    }
     UStaticMeshComponent* FloorMesh = NewObject<UStaticMeshComponent>(this);
     FloorMesh->SetStaticMesh(Tile);
     FloorMesh->RegisterComponent();
@@ -585,7 +684,7 @@ void ALevelGenarator::SpawnWall(FVector vec, FRotator rot)
 
 void ALevelGenarator::CleanUp()
 {
-    //Free subarrays
+    //Free map subarrays
     for(int i = 0; i < MapBounds; i++)
     {
         if(MapTiles)
@@ -601,6 +700,24 @@ void ALevelGenarator::CleanUp()
     if(MapTiles)
     {
         FMemory::Free(MapTiles);
+    }
+    
+    //Free adj subarrays
+    for(int i = 0; i < RoomCount; i++)
+    {
+        if(AdjMatrix)
+        {
+            if(AdjMatrix[i])
+            {
+                FMemory::Free(AdjMatrix[i]);
+            }
+        }
+    }
+    
+    //Free overall adj matrix
+    if(AdjMatrix)
+    {
+        FMemory::Free(AdjMatrix);
     }
     
     for(int i = 1; i <=RoomCount; i++)
