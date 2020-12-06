@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/PlayerStart.h"
 #include "LevelGenarator.generated.h"
 
 
@@ -70,6 +71,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UStaticMesh* Wall;
     
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    APlayerStart* PlayerStart;
+    
     UPROPERTY()
     bool RoomStartDone;
     
@@ -99,8 +103,6 @@ protected:
 	virtual void BeginPlay() override;
     
     virtual void PostInitializeComponents() override;
-    
-    virtual void PostActorConstruction() override;
 
 public:	
 	// Called every frame
@@ -168,5 +170,8 @@ public:
     
     UFUNCTION()
     void PlaceSpawn();
+    
+    UFUNCTION(BlueprintCallable)
+    APlayerStart* GetPlayerStart();
 
 };

@@ -128,12 +128,7 @@ void ALevelGenarator::PostInitializeComponents()
     DungeonLayout();
     GrowRooms();
     PlaceWalls();
-//    PlaceSpawn();
-}
-
-void ALevelGenarator::PostActorConstruction()
-{
-    Super::PostActorConstruction();
+    PlaceSpawn();
 }
 
 // Called every frame
@@ -405,10 +400,10 @@ bool ALevelGenarator::UpdateAdjMatrix(int r, int c, int room1, int room2)
 //    AdjMatrix[room2][room1] = 1;
     Adjacency[room1-1].Set(room2-1, 1);
     Adjacency[room2-1].Set(room1-1, 1);
-    if(GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UPDATE ADJ"));
-    }
+//    if(GEngine)
+//    {
+//        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UPDATE ADJ"));
+//    }
     return true;
 }
 
@@ -463,11 +458,16 @@ void ALevelGenarator::PlaceSpawn()
     SpawnInfo.bDeferConstruction = false;
     FVector Loc(50.0f+600.f*RoomStartRow, 50.0f+600.f*RoomStartCol, 150.0f);
 
-//    APlayerStart* PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
+    PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
+    PlayerStart->Tags.Add(FName("STARTMAP"));
 
-    GetWorld()->SpawnActor<APlayerStart>(Loc, FRotator::ZeroRotator, SpawnInfo);
+//    GetWorld()->SpawnActor<APlayerStart>(Loc, FRotator::ZeroRotator, SpawnInfo);
 //
 
+}
+APlayerStart* ALevelGenarator::GetPlayerStart()
+{
+    return PlayerStart;
 }
 bool ALevelGenarator::PlaceAdditionalRoom(int Row, int Col, int CurrentRoom)
 {
