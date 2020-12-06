@@ -86,6 +86,12 @@ public:
     
     UPROPERTY()
     TArray<FMap2dArray> Check2;
+    
+    UPROPERTY()
+    TArray<FMap2dArray> MapOfTiles;
+    
+    UPROPERTY()
+    TArray<FMap2dArray> Adjacency;
 
 
 protected:
@@ -143,5 +149,17 @@ public:
     
     UFUNCTION()
     void BuildPath(int r, int c, int room1, int room2);
+    
+    UFUNCTION()
+    bool FullyConnected();
+    
+    UFUNCTION()
+    int NextUnconnectedRoom(int Room);
+    
+    UFUNCTION()
+    void PlaceWalls();
+    
+    UFUNCTION()
+    bool WallCheck(int r, int c, int deltar, int deltac);
 
 };
