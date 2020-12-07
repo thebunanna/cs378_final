@@ -101,6 +101,8 @@ void ACharacterCreator::BeginPlay()
 {
 	Super::BeginPlay();
 
+	data = (UPlayerData*) GetGameInstance();
+
 	material = UMaterialInstanceDynamic::Create(Head->GetMaterial(0), NULL);
 	// material->SetVectorParameterValue(FName(TEXT("Color_BodyArt")), FLinearColor(1.f, 0.f, 0.f));
 
@@ -108,6 +110,10 @@ void ACharacterCreator::BeginPlay()
 	Hair->SetMaterial(0, material);
 	Eyebrows->SetMaterial(0, material);
 	FacialHair->SetMaterial(0, material);
+
+	data->SkinColor = FVector(1.f, 0.603828f, 0.423268f);
+	data->PaintColor = FVector(0.f, 0.533276f, 0.084303f);
+	data->HairColor = FVector(0.056128f, 0.036889f, 0.015996f);
 }
 
 void ACharacterCreator::ChangeGender(bool NewGender)
@@ -159,23 +165,24 @@ void ACharacterCreator::RotateFace(float value)
 
 void ACharacterCreator::SkinColor(float r, float g, float b)
 {
+	data->SkinColor = FVector(r, g, b);
 	material->SetVectorParameterValue(FName(TEXT("Color_Skin")), FLinearColor(r, g, b));
 }
 
 void ACharacterCreator::PaintColor(float r, float g, float b)
 {
+	data->PaintColor = FVector(r, g, b);
 	material->SetVectorParameterValue(FName(TEXT("Color_BodyArt")), FLinearColor(r, g, b));
 }
 
 void ACharacterCreator::HairColor(float r, float g, float b)
 {
+	data->HairColor = FVector(r, g, b);
 	material->SetVectorParameterValue(FName(TEXT("Color_Hair")), FLinearColor(r, g, b));
 }
 
 void ACharacterCreator::Save()
 {
-	UPlayerData* data = (UPlayerData*) GetGameInstance();
-
 	data->Gender = Gender;
 	data->HairMesh = Hair->SkeletalMesh;
 	data->HeadMesh = Head->SkeletalMesh;
