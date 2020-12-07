@@ -50,6 +50,10 @@ AModularPlayerCharacter::AModularPlayerCharacter()
 
 	CharacterState = ECharacterStateEnum::IDLE;
 	gender = false;
+	Hair_Option = 0;
+	Head_Option = 0;
+	Eyebrows_Option = 0;
+	FacialHair_Option = 0;
 }
 
 // Called when the game starts or when spawned
@@ -164,7 +168,9 @@ void AModularPlayerCharacter::EquipArmor(TSubclassOf<AArmor> armorReference)
 
 		EquippedArmor.Add(armorPiece->ArmorPart, armorPiece);
 		armorPiece->MaleArmorMesh->SetMasterPoseComponent(GetMesh());
+
 		armorPiece->FemaleArmorMesh->SetMasterPoseComponent(GetMesh());
+
 		armorPiece->SetGender(gender);
 
 		FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
@@ -198,7 +204,9 @@ void AModularPlayerCharacter::Load()
 		TMap<EArmorPartEnum, TSubclassOf<AArmor>> SavedArmor = data->SavedArmor;
 
 		gender = data->Gender;
+
 		Head->SetSkeletalMesh(data->HeadMesh);
+		data->Material = UMaterialInstanceDynamic::Create(Head->GetMaterial(0), NULL);
 		Head->SetMaterial(0, data->Material);
 
 		Hair->SetSkeletalMesh(data->HairMesh);
@@ -210,6 +218,10 @@ void AModularPlayerCharacter::Load()
 		FacialHair->SetSkeletalMesh(data->FacialHairMesh);
 		FacialHair->SetMaterial(0, data->Material);
 
+		data->Material->SetVectorParameterValue(FName(TEXT("Color_Skin")), FLinearColor(data->SkinColor));
+		data->Material->SetVectorParameterValue(FName(TEXT("Color_BodyArt")), FLinearColor(data->PaintColor));
+		data->Material->SetVectorParameterValue(FName(TEXT("Color_Hair")), FLinearColor(data->HairColor));
+
 		for (auto& armor : SavedArmor)
 		{
 			if (armor.Value)
@@ -219,6 +231,15 @@ void AModularPlayerCharacter::Load()
 			else
 			{
 				EquipArmor(DefaultArmor[armor.Key]);
+			}
+		}
+
+		for (auto& armor : EquippedArmor)
+		{
+			if (armor.Value)
+			{
+				armor.Value->MaleArmorMesh->SetMaterial(0, data->Material);
+				armor.Value->FemaleArmorMesh->SetMaterial(0, data->Material);
 			}
 			
 		}

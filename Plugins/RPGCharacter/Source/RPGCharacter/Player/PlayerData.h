@@ -24,6 +24,9 @@ public:
 		TMap<EArmorPartEnum, TSubclassOf<AArmor>> SavedArmor;
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
+		FString Name;
+
+	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
 		bool Gender;
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
@@ -40,4 +43,13 @@ public:
 
 	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
 		UMaterialInstanceDynamic* Material;
+
+	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
+		FVector SkinColor;
+
+	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
+		FVector PaintColor;
+
+	UPROPERTY(Category = Customization, EditAnywhere, BlueprintReadWrite)
+		FVector HairColor;
 };

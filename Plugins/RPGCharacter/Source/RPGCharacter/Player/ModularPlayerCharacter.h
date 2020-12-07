@@ -66,16 +66,40 @@ public:
 		bool gender;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int Hair_Option;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int Head_Option;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int Eyebrows_Option;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		int FacialHair_Option;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		USkeletalMeshComponent* Head;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* HeadMesh;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		USkeletalMeshComponent* Hair;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* HairMesh;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		USkeletalMeshComponent* Eyebrows;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* EyebrowsMesh;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		USkeletalMeshComponent* FacialHair;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* FacialHairMesh;
 
 
 protected:
@@ -160,4 +184,5 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void Load();
+
 };
