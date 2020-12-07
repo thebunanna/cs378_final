@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ModularPlayerCharacter.h"
+#include "CharacterCreator.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
@@ -33,6 +34,9 @@ public:
 	void StopBlock();
 
 	UFUNCTION(BlueprintCallable)
+		void EquipArmor(TSubclassOf<AArmor> armor);
+
+	UFUNCTION(BlueprintCallable)
 		void ChangeGender(bool gender);
 
 	UFUNCTION(BlueprintCallable)
@@ -48,12 +52,14 @@ public:
 		void ChangeFacialHair(float value);
 
 	UFUNCTION(BlueprintCallable)
-		void Save();
+		void SkinColor(float r, float g, float b);
 
 	UFUNCTION(BlueprintCallable)
-		void EquipNone();
+		void PaintColor(float r, float g, float b);
 
+	UFUNCTION(BlueprintCallable)
+		void HairColor(float r, float g, float b);
 
-	void EquipLight();
-	void EquipHeavy();
+	UFUNCTION(BlueprintCallable)
+		void Save();
 };

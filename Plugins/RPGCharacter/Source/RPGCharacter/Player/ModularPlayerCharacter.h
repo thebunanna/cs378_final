@@ -60,6 +60,9 @@ public:
 		TMap<EArmorPartEnum, AArmor*> EquippedArmor;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		TMap<EArmorPartEnum, TSubclassOf<AArmor>> DefaultArmor;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		bool gender;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
@@ -78,13 +81,25 @@ public:
 		USkeletalMeshComponent* Head;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* HeadMesh;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		USkeletalMeshComponent* Hair;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* HairMesh;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		USkeletalMeshComponent* Eyebrows;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* EyebrowsMesh;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		USkeletalMeshComponent* FacialHair;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		USkeletalMesh* FacialHairMesh;
 
 
 protected:
@@ -154,33 +169,10 @@ public:
 		void Block();
 
 	UFUNCTION(BlueprintCallable)
-		void TakeCharDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-
-	// ------------------
-	// Character Creation
-	// ------------------
+		void TakeHPDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(BlueprintCallable)
-		void EquipArmor(AArmor* armorPiece);
-
-	UFUNCTION(BlueprintCallable)
-		void ChangeGender(bool NewGender);
-
-	UFUNCTION(BlueprintCallable)
-		void ChangeHead(float value);
-
-	UFUNCTION(BlueprintCallable)
-		void ChangeHair(float value);
-
-	UFUNCTION(BlueprintCallable)
-		void ChangeEyebrows(float value);
-
-	UFUNCTION(BlueprintCallable)
-		void ChangeFacialHair(float value);
-
-	UFUNCTION(BlueprintCallable)
-		void ChangePart(USkeletalMeshComponent* headPart, FString refrence);
+		void EquipArmor(TSubclassOf<AArmor> armorReference);
 
 
 	// ---------
@@ -193,26 +185,4 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void Load();
 
-
-	// ---------
-	// Debugging
-	// ---------
-
-	UFUNCTION(BlueprintCallable)
-		void EquipNoneArmor();
-
-	UFUNCTION(BlueprintCallable)
-		void EquipLightArmor();
-
-	UFUNCTION(BlueprintCallable)
-		void EquipHeavyArmor();
-
-	UFUNCTION(BlueprintCallable)
-	 	void LoadWeapon();
-
-	UFUNCTION(BlueprintCallable)
-		void LoadWeapon2();
-
-	UFUNCTION(BlueprintCallable)
-	 	void LoadShield();
 };
