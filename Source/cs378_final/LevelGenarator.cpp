@@ -261,7 +261,7 @@ void ALevelGenarator::PlaceWalls()
                 //RightCol
                 if(WallCheck(i,j,0,1))
                 {
-                    FVector Location(0.0f+(600*i), 0.0f+600.f*(1+j), 70.f);
+                    FVector Location(0.0f+(600*i), 0.0f+600.f*(1+j), 75.f);
                     FRotator Rotation(0.0f, -90.0f, 0.0f);
                     SpawnWall(Location, Rotation);
                 }
@@ -269,7 +269,7 @@ void ALevelGenarator::PlaceWalls()
                 //LeftCol
                 if(WallCheck(i,j,0,-1))
                 {
-                    FVector Location(0.0f+(600.f*i), 0.0f+(600.f*j), 70.f);
+                    FVector Location(0.0f+(600.f*i), 0.0f+(600.f*j), 75.f);
                     FRotator Rotation(0.0f, -90.0f, 0.0f);
                     SpawnWall(Location, Rotation);
                 }
@@ -277,7 +277,7 @@ void ALevelGenarator::PlaceWalls()
                 //AboveRow
                 if(WallCheck(i,j,1,0))
                 {
-                    FVector Location(0.0f+600.f*(1+i), 0.0f+(600.f*j), 70.f);
+                    FVector Location(0.0f+600.f*(1+i), 0.0f+(600.f*j), 75.f);
                     FRotator Rotation(0.0f, 0.0f, 0.0f);
                     SpawnWall(Location, Rotation);
 
@@ -286,7 +286,7 @@ void ALevelGenarator::PlaceWalls()
                 //BelowRow
                 if(WallCheck(i,j,-1,0))
                 {
-                    FVector Location(0.0f+600.f*i, 0.0f+600.f*j, 70.f);
+                    FVector Location(0.0f+600.f*i, 0.0f+600.f*j, 75.f);
                     FRotator Rotation(0.0f, 0.0f, 0.0f);
                     SpawnWall(Location, Rotation);
                 }
