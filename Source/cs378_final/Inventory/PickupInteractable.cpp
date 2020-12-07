@@ -13,17 +13,21 @@ APickupInteractable::APickupInteractable()
 
 	ItemID = FName("No ID");
 
-	Super::Name = "Item";
-	Super::Action = "pickup";
+	Name = "Item";
+	Action = "pickup";
 }
 
 void APickupInteractable::Interact_Implementation(APlayerController* Controller)
 {
-	Super::Interact_Implementation(Controller);
 	if (Controller) {
-		UInventoryComponent* IController = Cast<Acs378_PlayerController>(Controller)->GetInventory();
-		if (IController->AddItemToInventoryByID(ItemID))
+		UInventoryComponent* InvController = Cast<Acs378_PlayerController>(Controller)->GetInventory();
+		if (InvController->AddItemToInventoryByID(ItemID, this->GetClass(), this->Type))
 			Destroy();
 	}
 	
+}
+
+FString APickupInteractable::GetInteractText() const
+{
+	return FString::Printf(TEXT("%s: Press F to %s"), *Name, *Action);
 }

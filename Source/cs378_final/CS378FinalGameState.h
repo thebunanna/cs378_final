@@ -18,9 +18,16 @@ public:
 	ACS378FinalGameState();
 
 	UFUNCTION(BlueprintCallable)
-	UDataTable* GetItemDB() const;
+		UDataTable* GetItemDB() const;
+
+	UFUNCTION(BlueprintCallable)
+		UDataTable* GetArmorDB() const;
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
 		class UDataTable* ItemDB;
+
+	UPROPERTY(EditDefaultsOnly)
+		class UDataTable* ArmorDB;
 };
