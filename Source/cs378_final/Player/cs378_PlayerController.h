@@ -8,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
+#include "../Inventory/UI/InventoryWidget.h"
 #include "cs378_PlayerController.generated.h"
 
 /**
@@ -27,8 +28,18 @@ protected:
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Inventory)
 		class UInventoryComponent* Inv;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Inventory)
+		class TSubclassOf<class UInventoryWidget> BP_InvWidget;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Inventory)
+		UInventoryWidget* IW;
+
 	UFUNCTION(BlueprintCallable)
 		UInventoryComponent* GetInventory();
+
+	UFUNCTION(BlueprintCallable)
+		void LoadInvWidget();
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void ReloadInventory();
