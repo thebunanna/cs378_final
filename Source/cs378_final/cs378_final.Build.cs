@@ -8,11 +8,11 @@ public class cs378_final : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "RPGCharacter" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "RPGCharacter", "UMG" });
 		
 		PublicIncludePaths.AddRange(new string[] { "../Plugins/RPGCharacter/Source/RPGCharacter/Player"});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "RPGCharacter" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "RPGCharacter", "Slate", "SlateCore" });
 		PrivateIncludePathModuleNames.AddRange(new string[] { "RPGCharacter" });
 
 		// Uncomment if you are using Slate UI
