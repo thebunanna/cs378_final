@@ -125,16 +125,19 @@ bool UInventoryComponent::UseItem(FInventoryItem item)
 				FArmourItem* Armour = ArmorTable->FindRow<FArmourItem>(search, "");
 
 				if (Armour != NULL) {
+					ModPawn->EquipArmor(Armour->actor);
+					/*
 					FActorSpawnParameters sp = FActorSpawnParameters();
 					FTransform trans = ModPawn->GetTransform();
 
 					AArmor* created_armour = Cast<AArmor>(GetWorld()->SpawnActor(Armour->actor, &trans, sp));
 
 					if (created_armour != NULL) {
-						ModPawn->EquipArmor(created_armour);
 					}
 					else
 						UE_LOG(LogTemp, Warning, TEXT("Spawning failed Non Armour"));
+					
+					*/
 					
 				}
 				else {
