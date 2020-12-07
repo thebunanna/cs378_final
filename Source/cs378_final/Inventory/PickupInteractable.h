@@ -23,6 +23,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		FString GetInteractText() const override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+		int32 GetValue();
+
 protected:
 	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* PickupMesh;
@@ -35,5 +38,6 @@ protected:
 		FString Action;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ItemType Type;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Value;
 };

@@ -19,7 +19,7 @@ UInventoryComponent::UInventoryComponent()
 }
 
 
-bool UInventoryComponent::AddItemToInventoryByID(FName ID, TSubclassOf<class AActor> base, ItemType Type)
+bool UInventoryComponent::AddItemToInventoryByID(FName ID, TSubclassOf<class AActor> base, ItemType Type, int32 val)
 {
 	static int32 uid = 0;
 
@@ -47,14 +47,21 @@ bool UInventoryComponent::AddItemToInventoryByID(FName ID, TSubclassOf<class AAc
 		NewItem.ItemID.SetNumber(uid++);
 		NewItem.actor = base;
 		NewItem.Type = Type;
+		NewItem.Value = val;
 		if (Inventory.Num() < InventorySlotLimit)
 		{
 			Inventory.Add(NewItem);
 			ReloadInventory();
 			return true;
 		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Max Slots reached."));
+		}
 	}
-	
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Not Found."));
+		return false;
+	}
 	
 	return false;
 }

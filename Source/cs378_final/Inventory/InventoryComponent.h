@@ -25,7 +25,7 @@ public:
 		void ReloadInventory();
 
 	UFUNCTION(BlueprintCallable, Category = "Utils")
-		bool AddItemToInventoryByID(FName ID, TSubclassOf<class AActor> base, ItemType Type);
+		bool AddItemToInventoryByID(FName ID, TSubclassOf<class AActor> base, ItemType Type, int32 val);
 	UFUNCTION(BlueprintCallable, Category = "Utils")
 		bool RemoveFromInventory(FInventoryItem item, bool spawn);
 	UFUNCTION(BlueprintCallable, Category = "Utils")
