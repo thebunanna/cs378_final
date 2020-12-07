@@ -110,6 +110,10 @@ void ACharacterCreator::BeginPlay()
 	Hair->SetMaterial(0, material);
 	Eyebrows->SetMaterial(0, material);
 	FacialHair->SetMaterial(0, material);
+
+	data->SkinColor = FVector(1.f, 0.603828f, 0.423268f);
+	data->PaintColor = FVector(0.f, 0.533276f, 0.084303f);
+	data->HairColor = FVector(0.056128f, 0.036889f, 0.015996f);
 }
 
 void ACharacterCreator::ChangeGender(bool NewGender)
