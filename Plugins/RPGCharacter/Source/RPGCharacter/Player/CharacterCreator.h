@@ -36,6 +36,7 @@ public:
 	// Sets default values for this actor's properties
 	ACharacterCreator();
 
+	UPlayerData* data;
 	UMaterialInstanceDynamic* material;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
