@@ -96,6 +96,10 @@ public:
     
     UPROPERTY()
     TArray<FMap2dArray> Adjacency;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TSubclassOf<AActor> VICTORYOBJ;
+
 
 
 protected:
@@ -173,5 +177,14 @@ public:
     
     UFUNCTION(BlueprintCallable)
     APlayerStart* GetPlayerStart();
+    
+    UFUNCTION()
+    void PlaceEntities();
+    
+    UFUNCTION()
+    void SpawnEnemies(int Roomidx, int NumberEnemies);
+    
+    UFUNCTION()
+    void SpawnItems(int RoomNum, int items);
 
 };

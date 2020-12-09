@@ -129,6 +129,80 @@ void ALevelGenarator::PostInitializeComponents()
     GrowRooms();
     PlaceWalls();
     PlaceSpawn();
+    PlaceEntities();
+}
+
+void ALevelGenarator::PlaceEntities()
+{
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    FVector FloorLocation(75.f+600.f*RoomEndRow,75.f+600.f*RoomEndCol,150.f);
+    FRotator rotaion = FRotator(0.f, 90.f, 0.f);
+//    PlayerStart = GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), Loc ,FRotator::ZeroRotator, SpawnInfo );
+    if(VICTORYOBJ)
+    {
+        GetWorld()->SpawnActor<AActor>(VICTORYOBJ, FloorLocation, rotaion, SpawnParams);
+        if(GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("SPAWNED FINAL OBJ"));
+        }
+    } else
+    {
+        if(GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("NO FINAL OBJ"));
+        }
+    }
+
+    for(int i = 1; i <= RoomCount; i++)
+    {
+        //spawn if hit a 2
+        int RNGEnemy = FMath::RandRange(0,2);
+        if(RNGEnemy == 2)
+        {
+            int NumberEnemies = FMath::RandRange(2,4);
+            SpawnEnemies(i, NumberEnemies);
+            if(GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("SPAWN ENEMY"));
+            }
+        }
+        if(RNGEnemy < 2)
+        {
+            int NumberEnemies = FMath::RandRange(2,4);
+            SpawnItems(i, NumberEnemies);
+            if(GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("SPAWN Item"));
+            }
+            
+        }
+    }
+    
+    
+}
+void ALevelGenarator::SpawnEnemies(int RoomNum, int Enemies)
+{
+    for(int i = 1; i <= Enemies; i++)
+    {
+        int Row = RoomRows[RoomNum][0];
+        int Col = RoomCols[RoomNum][0];
+        FVector FloorLocation((75.f*i)+600.f*Row,75.f+600.f*Col,150.f);
+        FRotator Rotation = FRotator(0.f, 90.f, 0.f);
+    }
+    
+}
+void ALevelGenarator::SpawnItems(int RoomNum, int items)
+{
+    for(int i = 1; i <= items; i++)
+    {
+        int Row = RoomRows[RoomNum][0];
+        int Col = RoomCols[RoomNum][0];
+        FVector FloorLocation((75.f*i)+600.f*Row,75.f+600.f*Col,150.f);
+        FRotator Rotation = FRotator(0.f, 90.f, 0.f);
+    }
+    
 }
 
 // Called every frame
