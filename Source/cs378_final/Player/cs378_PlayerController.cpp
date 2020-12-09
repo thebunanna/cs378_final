@@ -25,6 +25,7 @@ void Acs378_PlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("Interact", IE_Pressed, Inv, &UInventoryComponent::Interact);
+    
 	//if (GEngine) GEngine->AddOnScreenDebugMessage(1, 1.5f, FColor::White,
 	//	           TEXT("HI there"));
 }

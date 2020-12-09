@@ -32,6 +32,7 @@ public:
 	void Attack();
 	void Block();
 	void StopBlock();
+    void Pause();
 
 	UFUNCTION(BlueprintCallable)
 		void EquipArmor(TSubclassOf<AArmor> armor);
