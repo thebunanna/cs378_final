@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CharacterCreator.h"
+#include "ProceduralEnemy.h"
 
 // Sets default values
-ACharacterCreator::ACharacterCreator()
+AProceduralEnemy::AProceduralEnemy()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	// Load heads
@@ -16,6 +16,7 @@ ACharacterCreator::ACharacterCreator()
 		int digit2 = i % 10;
 		FString index = FString::FromInt(digit1) + FString::FromInt(digit2);
 
+		
 		FString MaleReference = FString("SkeletalMesh'/RPGCharacter/ModularCharacters/ModularParts/SK_Chr_Head_Male_" + index + ".SK_Chr_Head_Male_" + index + "'");
 		USkeletalMesh* NewMaleMesh = Cast<USkeletalMesh>(StaticLoadObject(USkeletalMesh::StaticClass(), NULL, *FString(MaleReference)));
 		HeadOptions_Male.Add(NewMaleMesh);
@@ -65,137 +66,101 @@ ACharacterCreator::ACharacterCreator()
 		FacialHairOptions.Add(NewMesh);
 	}
 
-	// Attach Components
 	Head = CreateDefaultSubobject<USkeletalMeshComponent>("Head");
 	Head->SetupAttachment(GetMesh());
-	Head->SetSkeletalMesh(HeadOptions_Female[0]);
 
 	Hair = CreateDefaultSubobject<USkeletalMeshComponent>("Hair");
 	Hair->SetupAttachment(Head);
-	Hair->SetSkeletalMesh(HairOptions[0]);
 
 	Eyebrows = CreateDefaultSubobject<USkeletalMeshComponent>("Eyebrows");
 	Eyebrows->SetupAttachment(Head);
-	Eyebrows->SetSkeletalMesh(EyebrowsOptions_Female[0]);
 
 	FacialHair = CreateDefaultSubobject<USkeletalMeshComponent>("FacialHair");
 	FacialHair->SetupAttachment(Head);
-	FacialHair->SetSkeletalMesh(FacialHairOptions[0]);
-
-	// Create a camera boom...
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->SetUsingAbsoluteRotation(true);
-	CameraBoom->TargetArmLength = 60.f;
-	CameraBoom->bDoCollisionTest = true;
-	CameraBoom->SetWorldLocation(this->GetActorLocation());
-
-	// Create a camera...
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	CameraComponent->bUsePawnControlRotation = false;
-
-	Name = "Default";
 }
 
 // Called when the game starts or when spawned
-void ACharacterCreator::BeginPlay()
+void AProceduralEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	data = (UPlayerData*) GetGameInstance();
-
-	material = UMaterialInstanceDynamic::Create(Head->GetMaterial(0), NULL);
-	// material->SetVectorParameterValue(FName(TEXT("Color_BodyArt")), FLinearColor(1.f, 0.f, 0.f));
-
-	Head->SetMaterial(0, material);
-	Hair->SetMaterial(0, material);
-	Eyebrows->SetMaterial(0, material);
-	FacialHair->SetMaterial(0, material);
-
-	data->SkinColor = FVector(1.f, 0.603828f, 0.423268f);
-	data->PaintColor = FVector(0.f, 0.533276f, 0.084303f);
-	data->HairColor = FVector(0.056128f, 0.036889f, 0.015996f);
-
+	
 }
 
-void ACharacterCreator::ChangeName(FString NewName)
+void AProceduralEnemy::GenerateEnemy()
 {
-	Name = NewName;
-}
+	Gender = FMath::RandRange(0, 1) == 0;
 
-void ACharacterCreator::ChangeGender(bool NewGender)
-{
-	Gender = NewGender;
-	ChangeHead(HeadIndex);
-	ChangeEyebrows(EyebrowsIndex);
-}
+	// Generate Armor
+	int index = FMath::RandRange(0, ArmorSets.Num() - 1);
+	int i = 0;
+	for (auto& ArmorSet : ArmorSets)
+	{
+		if (i == index)
+		{
+			for	(auto& Armor : ArmorSet.Value.ArmorSet)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				AArmor* armorPiece = (AArmor*) GetWorld()->SpawnActor<AActor>(Armor.Value, GetActorLocation(), GetActorRotation(), SpawnParams);
 
-void ACharacterCreator::ChangeHead(int value)
-{
+				if (EquippedArmor.Contains(armorPiece->ArmorPart))
+				{
+					EquippedArmor[armorPiece->ArmorPart]->Destroy();
+					EquippedArmor.Remove(armorPiece->ArmorPart);
+				}
+
+				EquippedArmor.Add(armorPiece->ArmorPart, armorPiece);
+				armorPiece->MaleArmorMesh->SetMasterPoseComponent(GetMesh());
+				armorPiece->FemaleArmorMesh->SetMasterPoseComponent(GetMesh());
+				armorPiece->SetGender(Gender);
+
+				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+				armorPiece->AttachToActor(this, rules, "Root");
+			}
+			break;
+		}
+
+		++i;
+	}
+
+	// Generate Face
+	index = FMath::RandRange(0, HeadOptions_Male.Num() - 1);
 	if (Gender)
 	{
-		Head->SetSkeletalMesh(HeadOptions_Male[value]);
+		Head->SetSkeletalMesh(HeadOptions_Male[index]);
 	}
 	else
 	{
-		Head->SetSkeletalMesh(HeadOptions_Female[value]);
+		Head->SetSkeletalMesh(HeadOptions_Female[index]);
 	}
-}
+	
+	Head->SetMasterPoseComponent(GetMesh());
 
+	index = FMath::RandRange(0, HairOptions.Num() - 1);
+	Hair->SetSkeletalMesh(HairOptions[index]);
+	Hair->SetMasterPoseComponent(GetMesh());
 
-void ACharacterCreator::ChangeHair(int value)
-{
-	Hair->SetSkeletalMesh(HairOptions[value]);
-}
+	index = FMath::RandRange(0, EyebrowsOptions_Male.Num() - 1);
+	Eyebrows->SetSkeletalMesh(EyebrowsOptions_Male[index]);
+	Eyebrows->SetMasterPoseComponent(GetMesh());
 
-void ACharacterCreator::ChangeEyebrows(int value)
-{
+	index = FMath::RandRange(0, FacialHairOptions.Num() - 1);
 	if (Gender)
 	{
-		Eyebrows->SetSkeletalMesh(EyebrowsOptions_Male[value]);
+		FacialHair->SetSkeletalMesh(FacialHairOptions[index]);
 	}
 	else
 	{
-		Eyebrows->SetSkeletalMesh(EyebrowsOptions_Female[value]);
+		FacialHair->SetSkeletalMesh(nullptr);
 	}
+	FacialHair->SetMasterPoseComponent(GetMesh());
+
+	// Generate Colors
+	
 }
 
-void ACharacterCreator::ChangeFacialHair(int value)
+void AProceduralEnemy::EquipArmor(TSubclassOf<AArmor> armorReference)
 {
-	FacialHair->SetSkeletalMesh(FacialHairOptions[value]);
-}
 
-void ACharacterCreator::RotateFace(float value)
-{
-	Head->AddLocalRotation(FRotator(0.f, -value, 0.f));
-}
-
-void ACharacterCreator::SkinColor(float r, float g, float b)
-{
-	data->SkinColor = FVector(r, g, b);
-	material->SetVectorParameterValue(FName(TEXT("Color_Skin")), FLinearColor(r, g, b));
-}
-
-void ACharacterCreator::PaintColor(float r, float g, float b)
-{
-	data->PaintColor = FVector(r, g, b);
-	material->SetVectorParameterValue(FName(TEXT("Color_BodyArt")), FLinearColor(r, g, b));
-}
-
-void ACharacterCreator::HairColor(float r, float g, float b)
-{
-	data->HairColor = FVector(r, g, b);
-	material->SetVectorParameterValue(FName(TEXT("Color_Hair")), FLinearColor(r, g, b));
-}
-
-void ACharacterCreator::Save()
-{
-	data->Name = Name;
-	data->Gender = Gender;
-	data->HairMesh = Hair->SkeletalMesh;
-	data->HeadMesh = Head->SkeletalMesh;
-	data->EyebrowsMesh = Eyebrows->SkeletalMesh;
-	data->FacialHairMesh = FacialHair->SkeletalMesh;
-	data->Material = material;
 }
