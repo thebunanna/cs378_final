@@ -18,6 +18,8 @@ void AModularPlayerController::SetupInputComponent()
 	InputComponent->BindAction("AttackAction", IE_Pressed, this, &AModularPlayerController::Attack);
 	InputComponent->BindAction("BlockAction", IE_Pressed, this, &AModularPlayerController::Block);
 	InputComponent->BindAction("BlockAction", IE_Released, this, &AModularPlayerController::StopBlock);
+    
+    InputComponent->BindAction("PauseAction", IE_Pressed, this, &AModularPlayerController::Pause);
 }
 
 // ------------------
@@ -40,6 +42,15 @@ void AModularPlayerController::Right(float value)
 	{
 		character->RightBPEvent(value);
 	}
+}
+void AModularPlayerController::Pause()
+{
+    AModularPlayerCharacter* character = Cast<AModularPlayerCharacter>(this->GetCharacter());
+    if (character)
+    {
+        character->PauseEvent();
+    }
+    
 }
 
 void AModularPlayerController::CameraY(float value)

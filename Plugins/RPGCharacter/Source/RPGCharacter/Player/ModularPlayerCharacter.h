@@ -139,6 +139,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void AttackBPEvent();
+    
+    UFUNCTION(BlueprintImplementableEvent)
+        void PauseEvent();
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void BlockBPEvent();
