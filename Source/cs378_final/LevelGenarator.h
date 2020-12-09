@@ -96,6 +96,12 @@ public:
     
     UPROPERTY()
     TArray<FMap2dArray> Adjacency;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TSubclassOf<AActor> Enemy;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TSubclassOf<AActor> Pickupable;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TSubclassOf<AActor> VICTORYOBJ;

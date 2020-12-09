@@ -190,6 +190,11 @@ void ALevelGenarator::SpawnEnemies(int RoomNum, int Enemies)
         int Col = RoomCols[RoomNum][0];
         FVector FloorLocation((75.f*i)+600.f*Row,75.f+600.f*Col,150.f);
         FRotator Rotation = FRotator(0.f, 90.f, 0.f);
+
+        FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		GetWorld()->SpawnActor<AActor>(Enemy, FloorLocation, Rotation, SpawnParams);
     }
     
 }
@@ -201,6 +206,11 @@ void ALevelGenarator::SpawnItems(int RoomNum, int items)
         int Col = RoomCols[RoomNum][0];
         FVector FloorLocation((75.f*i)+600.f*Row,75.f+600.f*Col,150.f);
         FRotator Rotation = FRotator(0.f, 90.f, 0.f);
+
+        FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		GetWorld()->SpawnActor<AActor>(Pickupable, FloorLocation, Rotation, SpawnParams);
     }
     
 }
