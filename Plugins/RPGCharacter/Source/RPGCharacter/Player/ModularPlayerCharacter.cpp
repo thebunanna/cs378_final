@@ -190,7 +190,11 @@ void AModularPlayerCharacter::Save()
 	{
 		for (auto& armor : EquippedArmor)
 		{
-			data->SavedArmor.Add(armor.Key, DefaultArmor[armor.Key]);
+			if (data->SavedArmor.Contains(armor.Value->ArmorPart))
+			{
+				data->SavedArmor.Remove(armor.Value->ArmorPart);
+			}
+			data->SavedArmor.Add(armor.Key, EquippedArmor[armor.Key]->GetClass());
 		}
 	}
 }

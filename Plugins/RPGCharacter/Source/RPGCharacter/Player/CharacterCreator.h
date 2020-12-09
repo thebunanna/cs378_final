@@ -31,13 +31,17 @@ class RPGCHARACTER_API ACharacterCreator : public ACharacter
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPlayerData* data;
 	
 public:	
 	// Sets default values for this actor's properties
 	ACharacterCreator();
 
-	UPlayerData* data;
 	UMaterialInstanceDynamic* material;
+
+	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
+		FString Name;
 
 	UPROPERTY(Category = Character, EditAnywhere, BlueprintReadWrite)
 		bool Gender;
@@ -87,6 +91,9 @@ public:
 	// ----------
 	// Swap Parts
 	// ----------
+
+	UFUNCTION(BlueprintCallable)
+		void ChangeName(FString NewName);
 
 	UFUNCTION(BlueprintCallable)
 		void ChangeGender(bool NewGender);
