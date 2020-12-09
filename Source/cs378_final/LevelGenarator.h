@@ -74,6 +74,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     APlayerStart* PlayerStart;
     
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TSubclassOf<AActor> Enemy;
+    
     UPROPERTY()
     bool RoomStartDone;
     

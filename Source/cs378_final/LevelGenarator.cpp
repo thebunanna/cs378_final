@@ -155,7 +155,7 @@ void ALevelGenarator::PlaceEntities()
         }
     }
 
-    for(int i = 1; i <= RoomCount; i++)
+    for(int i = 2; i <= RoomCount; i++)
     {
         //spawn if hit a 2
         int RNGEnemy = FMath::RandRange(0,2);
@@ -188,8 +188,13 @@ void ALevelGenarator::SpawnEnemies(int RoomNum, int Enemies)
     {
         int Row = RoomRows[RoomNum][0];
         int Col = RoomCols[RoomNum][0];
-        FVector FloorLocation((75.f*i)+600.f*Row,75.f+600.f*Col,150.f);
-        FRotator Rotation = FRotator(0.f, 90.f, 0.f);
+        FVector FloorLocation((150.f*i)+600.f*Row,150.f+600.f*Col,200.f);
+        FRotator Rotation = FRotator(0.f, 0.f, 0.f);
+        
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+        GetWorld()->SpawnActor<AActor>(Enemy, FloorLocation, Rotation, SpawnParams);
     }
     
 }
