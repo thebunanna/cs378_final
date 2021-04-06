@@ -9,3 +9,7 @@ your hands!
 
 FINAL REPORT: https://docs.google.com/document/d/1Wq7qCvhZDXj8qZpo0H7ZPZ6QP7Cuw2afFq8H2PRqZmA/edit?usp=sharing
 
+
+This project was worked on by Simon Pinochet Concha, Jared Hayes, Chineye Emeghara, and myself.
+
+I had worked on the inventory system within this game.
